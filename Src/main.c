@@ -31,6 +31,7 @@
 #include "rtwtypes.h"
 #include "comms.h"
 
+
 #if defined(DEBUG_I2C_LCD) || defined(SUPPORT_LCD)
 #include "hd44780.h"
 #endif
@@ -247,13 +248,27 @@ int main(void) {
       HAL_Delay(10);
     }
   #endif
-
+  
   while(1) {
+    #ifdef ENCODER
+      if (!encoder.ini){
+        // Try to re-initialize the encoder if not yet initialized
+        Encoder_Init();
+      } else if (!encoder.ali) {
+        // Run non-blocking encoder alignment
+        if (encoder.align_state == 0) {
+          Encoder_Align_Start(); // Start alignment if not already running
+        }
+        Encoder_Align(); // Process alignment state machine
+      }
+    #endif
+    
     if (buzzerTimer - buzzerTimer_prev > 16*DELAY_IN_MAIN_LOOP) {   // 1 ms = 16 ticks buzzerTimer
+   
 
     readCommand();                        // Read Command: input1[inIdx].cmd, input2[inIdx].cmd
     calcAvgSpeed();                       // Calculate average measured speed: speedAvg, speedAvgAbs
-
+  
     #ifndef VARIANT_TRANSPOTTER
       // ####### MOTOR ENABLING: Only if the initial input is very small (for SAFETY) #######
       if (enable == 0 && !rtY_Left.z_errCode && !rtY_Right.z_errCode && 
@@ -266,7 +281,7 @@ int main(void) {
         printf("-- Motors enabled --\r\n");
         #endif
       }
-
+     
       // ####### VARIANT_HOVERCAR #######
       #if defined(VARIANT_HOVERCAR) || defined(VARIANT_SKATEBOARD) || defined(ELECTRIC_BRAKE_ENABLE)
         uint16_t speedBlend;                                        // Calculate speed Blend, a number between [0, 1] in fixdt(0,16,15)
@@ -363,6 +378,8 @@ int main(void) {
         pwml = cmdL;
       #endif
     #endif
+    
+
 
     #ifdef VARIANT_TRANSPOTTER
       distance    = CLAMP(input1[inIdx].cmd - 180, 0, 4095);
@@ -472,8 +489,8 @@ int main(void) {
     #if defined(FEEDBACK_SERIAL_USART3)
       sideboardLeds(&sideboard_leds_R);
     #endif
-    
 
+   
     // ####### CALC BOARD TEMPERATURE #######
     filtLowPass32(adc_buffer.temp, TEMP_FILT_COEF, &board_temp_adcFixdt);
     board_temp_adcFilt  = (int16_t)(board_temp_adcFixdt >> 16);  // convert fixed-point to integer

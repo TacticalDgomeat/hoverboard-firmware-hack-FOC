@@ -22,7 +22,7 @@
 #define UTIL_H
 
 #include <stdint.h>
-
+#include "rtwtypes.h"
 
 // Rx Structures USART
 #if defined(CONTROL_SERIAL_USART2) || defined(CONTROL_SERIAL_USART3)
@@ -67,11 +67,42 @@ typedef struct {
   int16_t   dband;  // deadband
 } InputStruct;
 
+#ifdef ENCODER
+typedef struct {
+  boolean_T ini;
+  boolean_T ali;
+  int32_t offset;
+  uint8_t direction; // 1 = CW, 0 = CCW
+  int32_t current_count;
+  int32_t aligned_count;
+  int32_t mech_angle_deg;
+  int16_t align_inpTgt; // in util.c or as part of encoder struct
+  // Non-blocking alignment state variables
+  uint8_t align_state;        // Current alignment state (0=inactive, 1=sequence, 2=return, 3=wait, 4=calc)
+  uint32_t align_timer;       // Timer for alignment sequence timing
+  uint32_t align_start_time;  // Start time for alignment
+  uint16_t align_step_counter;// Step counter for alignment sequence
+  int32_t align_ini_pos;      // Initial encoder position before alignment
+  uint8_t align_sequence_step;// Current step in hall sequence
+} SensorState;
+extern SensorState encoder;
+    uint8_t hall_ul;
+    uint8_t hall_vl;
+    uint8_t hall_wl;
+TIM_HandleTypeDef encoder_handle;
+#endif
+
 // Initialization Functions
 void BLDC_Init(void);
 void Input_Lim_Init(void);
 void Input_Init(void);
 void UART_DisableRxErrors(UART_HandleTypeDef *huart);
+#if defined (ENCODER)
+void Encoder_Init(void);
+void Encoder_Align(void);
+void Encoder_Align_NonBlocking(void);  // Non-blocking encoder alignment state machine - call from main loop
+void Encoder_Align_Start(void);        // Start non-blocking encoder alignment sequence
+#endif
 
 // General Functions
 void poweronMelody(void);

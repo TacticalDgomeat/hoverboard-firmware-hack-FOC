@@ -20,8 +20,10 @@
   //#define VARIANT_HOVERBOARD  // Variant for HOVERBOARD build
   //#define VARIANT_TRANSPOTTER // Variant for TRANSPOTTER build https://github.com/NiklasFauth/hoverboard-firmware-hack/wiki/Build-Instruction:-TranspOtter https://hackaday.io/project/161891-transpotter-ng
   //#define VARIANT_SKATEBOARD  // Variant for SKATEBOARD build
+  //#define VARIANT_ENCODER      // Variant for control via ENCODER
 #endif
-// ########################### END OF VARIANT SELECTION ############################
+
+
 
 
 // ############################### DO-NOT-TOUCH SETTINGS ###############################
@@ -75,10 +77,10 @@
 #define BAT_FILT_COEF           655       // battery voltage filter coefficient in fixed-point. coef_fixedPoint = coef_floatingPoint * 2^16. In this case 655 = 0.01 * 2^16
 #define BAT_CALIB_REAL_VOLTAGE  3970      // input voltage measured by multimeter (multiplied by 100). In this case 43.00 V * 100 = 4300
 #define BAT_CALIB_ADC           1492      // adc-value measured by mainboard (value nr 5 on UART debug output)
-#define BAT_CELLS               10        // battery number of cells. Normal Hoverboard battery: 10s
+#define BAT_CELLS               6        // battery number of cells. Normal Hoverboard battery: 10s
 #define BAT_LVL2_ENABLE         0         // to beep or not to beep, 1 or 0
-#define BAT_LVL1_ENABLE         1         // to beep or not to beep, 1 or 0
-#define BAT_DEAD_ENABLE         1         // to poweroff or not to poweroff, 1 or 0
+#define BAT_LVL1_ENABLE         0         // to beep or not to beep, 1 or 0
+#define BAT_DEAD_ENABLE         0         // to poweroff or not to poweroff, 1 or 0
 #define BAT_BLINK_INTERVAL      80        // battery led blink interval (80 loops * 5ms ~= 400ms)
 #define BAT_LVL5                (390 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE    // Green blink:  no beep
 #define BAT_LVL4                (380 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE    // Yellow:       no beep
@@ -99,7 +101,7 @@
  * Write debug output value 8 to TEMP_CAL_LOW_ADC. drive around to warm up the board. it should be at least 20°C warmer. repeat it for the HIGH-values.
  * Enable warning and/or poweroff and make and flash firmware.
 */
-#define TEMP_FILT_COEF          655       // temperature filter coefficient in fixed-point. coef_fixedPoint = coef_floatingPoint * 2^16. In this case 655 = 0.01 * 2^16
+#define TEMP_FILT_COEF          655       // temperature filter coefficient in fixed-point. coefFixedPoint = coef_floatingPoint * 2^16. In this case 655 = 0.01 * 2^16
 #define TEMP_CAL_LOW_ADC        1655      // temperature 1: ADC value
 #define TEMP_CAL_LOW_DEG_C      358       // temperature 1: measured temperature [°C * 10]. Here 35.8 °C
 #define TEMP_CAL_HIGH_ADC       1588      // temperature 2: ADC value
@@ -144,11 +146,11 @@
 
 // Enable/Disable Motor
 #define MOTOR_LEFT_ENA                  // [-] Enable LEFT motor.  Comment-out if this motor is not needed to be operational
-#define MOTOR_RIGHT_ENA                 // [-] Enable RIGHT motor. Comment-out if this motor is not needed to be operational
+//#define MOTOR_RIGHT_ENA                 // [-] Enable RIGHT motor. Comment-out if this motor is not needed to be operational
 
 // Control selections
 #define CTRL_TYP_SEL    FOC_CTRL        // [-] Control type selection: COM_CTRL, SIN_CTRL, FOC_CTRL (default)
-#define CTRL_MOD_REQ    VLT_MODE        // [-] Control mode request: OPEN_MODE, VLT_MODE (default), SPD_MODE, TRQ_MODE. Note: SPD_MODE and TRQ_MODE are only available for CTRL_FOC!
+#define CTRL_MOD_REQ    TRQ_MODE        // [-] Control mode request: OPEN_MODE, VLT_MODE (default), SPD_MODE, TRQ_MODE. Note: SPD_MODE and TRQ_MODE are only available for CTRL_FOC!
 #define DIAG_ENA        1               // [-] Motor Diagnostics enable flag: 0 = Disabled, 1 = Enabled (default)
 
 // Limitation settings
@@ -174,12 +176,13 @@
 
 // ############################## DEFAULT SETTINGS ############################
 // Default settings will be applied at the end of this config file if not set before
-#define INACTIVITY_TIMEOUT        8       // Minutes of not driving until poweroff. it is not very precise.
-#define BEEPS_BACKWARD            1       // 0 or 1
+#define INACTIVITY_TIMEOUT        8      // Minutes of not driving until poweroff. it is not very precise.
+#define BEEPS_BACKWARD            0       // 0 or 1
 #define ADC_MARGIN                100     // ADC input margin applied on the raw ADC min and max to make sure the MIN and MAX values are reached even in the presence of noise
 #define ADC_PROTECT_TIMEOUT       100     // ADC Protection: number of wrong / missing input commands before safety state is taken
 #define ADC_PROTECT_THRESH        200     // ADC Protection threshold below/above the MIN/MAX ADC values
-#define AUTO_CALIBRATION_ENA              // Enable/Disable input auto-calibration by holding power button pressed. Un-comment this if auto-calibration is not needed.
+#define ENCODER
+//#define AUTO_CALIBRATION_ENA              // Enable/Disable input auto-calibration by holding power button pressed. Un-comment this if auto-calibration is not needed.
 
 /* FILTER is in fixdt(0,16,16): VAL_fixedPoint = VAL_floatingPoint * 2^16. In this case 6553 = 0.1 * 2^16
  * Value of COEFFICIENT is in fixdt(1,16,14)
@@ -634,6 +637,56 @@
 
 
 
+// ################################# VARIANT_ENCODER SETTINGS ############################
+#ifdef VARIANT_ENCODER
+/* ###### CONTROL VIA ENCODER ######
+ * This variant is for using encoders for motor control.
+*/
+#if defined ENCODER
+#define ENCODER_PPR      2048     // Pulses per revolution
+#define ENCODER_CPR      (ENCODER_PPR * 4)
+#define ENCODER_TIMER    TIM4
+#define ENCODER_CHA_PORT GPIOB
+#define ENCODER_CHB_PORT GPIOB
+#define ENCODER_CHA_PIN  GPIO_PIN_6
+#define ENCODER_CHB_PIN  GPIO_PIN_7
+#define ALIGNMENT_VOLTAGE       200      // [-] Voltage used for sensor alignment. [-1000, 1000]
+#endif
+  #define FLASH_WRITE_KEY     0x1011    // Flash memory writing key.
+  #undef  CTRL_MOD_REQ
+  #undef  CTRL_TYP_SEL
+  #define CTRL_TYP_SEL        FOC_CTRL 
+  #define CTRL_MOD_REQ        TRQ_MODE  
+  
+  #define TANK_STEERING  
+  #define MOTOR_LEFT_ENA                  // [-] Enable LEFT motor.  Comment-out if this motor is not needed to be operational
+//#define MOTOR_RIGHT_ENA                 // [-] Enable RIGHT motor. Comment-out if this motor is not needed to be operational
+#undef  DIAG_ENA 
+#define DIAG_ENA        1               // [-] Motor Diagnostics enable flag: 0 = Disabled, 1 = Enabled (default)
+#undef  INACTIVITY_TIMEOUT
+#define INACTIVITY_TIMEOUT        100
+// Limitation settings
+#define I_MOT_MAX       15              // [A] Maximum single motor current limit
+#define I_DC_MAX        17              // [A] Maximum stage2 DC Link current limit for Commutation and Sinusoidal types (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
+#define N_MOT_MAX       1000            // [rpm] Maximum motor speed limit
+
+#define FIELD_WEAK_ENA  0   
+#define CONTROL_PWM_LEFT   0         // Using PWM for input
+//#define CONTROL_SERIAL_USART3  0    // left sensor board cable, disable if ADC or PPM is used! For Arduino control check the hoverSerial.ino
+//#define FEEDBACK_SERIAL_USART3      // left sensor board cable, disable if ADC or PPM is used!
+  #define PRI_INPUT1          0, -1000, 0, 1000,   0    
+  #define PRI_INPUT2          1, -1000, 0, 1000, 100   
+
+  #define RATE              480
+  #define FILTER              6553
+  //#define INVERT_R_DIRECTION
+  //#define INVERT_L_DIRECTION
+  //#define DEBUG_SERIAL_USART3         // left sensor cable debug
+  
+  
+#endif
+// ############################# END OF VARIANT_ENCODER SETTINGS ############################
+
 // ########################### UART SETIINGS ############################
 #if defined(FEEDBACK_SERIAL_USART2) || defined(CONTROL_SERIAL_USART2) || defined(DEBUG_SERIAL_USART2) || defined(SIDEBOARD_SERIAL_USART2) || \
     defined(FEEDBACK_SERIAL_USART3) || defined(CONTROL_SERIAL_USART3) || defined(DEBUG_SERIAL_USART3) || defined(SIDEBOARD_SERIAL_USART3)
@@ -681,7 +734,7 @@
 
 // ############################### VALIDATE SETTINGS ###############################
 #if !defined(VARIANT_ADC) && !defined(VARIANT_USART) && !defined(VARIANT_NUNCHUK) && !defined(VARIANT_PPM) && !defined(VARIANT_PWM) && \
-    !defined(VARIANT_IBUS) && !defined(VARIANT_HOVERCAR) && !defined(VARIANT_HOVERBOARD) && !defined(VARIANT_TRANSPOTTER) && !defined(VARIANT_SKATEBOARD)
+    !defined(VARIANT_IBUS) && !defined(VARIANT_HOVERCAR) && !defined(VARIANT_HOVERBOARD) && !defined(VARIANT_TRANSPOTTER) && !defined(VARIANT_SKATEBOARD) && !defined(VARIANT_ENCODER)
   #error Variant not defined! Please check platformio.ini or Inc/config.h for available variants.
 #endif
 

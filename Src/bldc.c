@@ -28,6 +28,7 @@
 #include "config.h"
 #include "util.h"
 
+
 // Matlab includes and defines - from auto-code generation
 // ###############################################################################
 #include "BLDC_controller.h"           /* Model's header file */
@@ -46,10 +47,19 @@ extern ExtU rtU_Right;                  /* External inputs */
 extern ExtY rtY_Right;                  /* External outputs */
 // ###############################################################################
 
+
+
 static int16_t pwm_margin;              /* This margin allows to have a window in the PWM signal for proper FOC Phase currents measurement */
 
 extern uint8_t ctrlModReq;
 static int16_t curDC_max = (I_DC_MAX * A2BIT_CONV);
+
+#ifdef ENCODER
+extern uint8_t hall_ul;
+extern uint8_t hall_vl;  
+extern uint8_t hall_wl;
+#endif
+
 int16_t curL_phaA = 0, curL_phaB = 0, curL_DC = 0;
 int16_t curR_phaB = 0, curR_phaC = 0, curR_DC = 0;
 
@@ -171,21 +181,44 @@ void DMA1_Channel1_IRQHandler(void) {
  
   // ========================= LEFT MOTOR ============================ 
     // Get hall sensors values
+   
+    #ifndef ENCODER
     uint8_t hall_ul = !(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN);
     uint8_t hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
     uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
-
+    #endif
     /* Set motor inputs here */
     rtU_Left.b_motEna     = enableFin;
     rtU_Left.z_ctrlModReq = ctrlModReq;  
-    rtU_Left.r_inpTgt     = pwml;
     rtU_Left.b_hallA      = hall_ul;
     rtU_Left.b_hallB      = hall_vl;
-    rtU_Left.b_hallC      = hall_wl;
+    rtU_Left.b_hallC      = hall_wl; 
     rtU_Left.i_phaAB      = curL_phaA;
     rtU_Left.i_phaBC      = curL_phaB;
     rtU_Left.i_DCLink     = curL_DC;
-    // rtU_Left.a_mechAngle   = ...; // Angle input in DEGREES [0,360] in fixdt(1,16,4) data type. If `angle` is float use `= (int16_t)floor(angle * 16.0F)` If `angle` is integer use `= (int16_t)(angle << 4)`
+    
+    #ifdef ENCODER 
+    if (!encoder.align_state) {
+      rtU_Left.r_inpTgt = pwml;
+    } else {
+      rtU_Left.r_inpTgt = encoder.align_inpTgt;
+    }
+    if (encoder.ali){
+     encoder.current_count = encoder_handle.Instance->CNT;
+     encoder.aligned_count = encoder.current_count - encoder.offset;
+    if (encoder.direction == 0) {
+        encoder.aligned_count = -encoder.aligned_count;
+    }
+
+    encoder.aligned_count = (encoder.aligned_count % (int32_t)ENCODER_CPR + (int32_t)ENCODER_CPR) % (int32_t)ENCODER_CPR;
+    encoder.mech_angle_deg = (encoder.aligned_count * 3600) / (int32_t)ENCODER_CPR;
+    // Angle input in DEGREES [0,360] in fixdt(1,16,4) data type. If `angle` is float use `= (int16_t)floor(angle * 16.0F)` If `angle` is integer use `= (int16_t)(angle << 4)`
+    rtU_Left.a_mechAngle   = (int16_t)((encoder.mech_angle_deg * 16) / 10); 
+    }
+    #else
+    rtU_Left.r_inpTgt = pwml;
+    //rtU_Left.a_mechAngle   = 0;
+    #endif
     
     /* Step the controller */
     #ifdef MOTOR_LEFT_ENA    
@@ -209,6 +242,7 @@ void DMA1_Channel1_IRQHandler(void) {
 
   // ========================= RIGHT MOTOR ===========================  
     // Get hall sensors values
+    
     uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN);
     uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN);
     uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
@@ -216,14 +250,23 @@ void DMA1_Channel1_IRQHandler(void) {
     /* Set motor inputs here */
     rtU_Right.b_motEna      = enableFin;
     rtU_Right.z_ctrlModReq  = ctrlModReq;
-    rtU_Right.r_inpTgt      = pwmr;
     rtU_Right.b_hallA       = hall_ur;
     rtU_Right.b_hallB       = hall_vr;
     rtU_Right.b_hallC       = hall_wr;
     rtU_Right.i_phaAB       = curR_phaB;
     rtU_Right.i_phaBC       = curR_phaC;
     rtU_Right.i_DCLink      = curR_DC;
+  #ifdef ENCODER
     // rtU_Right.a_mechAngle   = ...; // Angle input in DEGREES [0,360] in fixdt(1,16,4) data type. If `angle` is float use `= (int16_t)floor(angle * 16.0F)` If `angle` is integer use `= (int16_t)(angle << 4)`
+    if (!encoder.align_state) {
+      rtU_Right.r_inpTgt = pwmr;
+    } else {
+      rtU_Right.r_inpTgt = encoder.align_inpTgt;
+    }
+    #else
+      rtU_Right.r_inpTgt = pwmr;
+    #endif
+    
     
     /* Step the controller */
     #ifdef MOTOR_RIGHT_ENA

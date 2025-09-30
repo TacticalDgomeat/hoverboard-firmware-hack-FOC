@@ -48,6 +48,11 @@ extern UART_HandleTypeDef huart3;
 extern int16_t batVoltage;
 extern uint8_t backwardDrive;
 extern uint8_t buzzerCount;             // global variable for the buzzer counts. can be 1, 2, 3, 4, 5, 6, 7...
+extern volatile uint32_t buzzerTimer;   // global timer variable for buzzer timing
+
+#ifdef ENCODER
+SensorState encoder = {0}; // Initialize all members to 0/false
+#endif
 extern uint8_t buzzerFreq;              // global variable for the buzzer pitch. can be 1, 2, 3, 4, 5, 6, 7...
 extern uint8_t buzzerPattern;           // global variable for the buzzer pattern. can be 1, 2, 3, 4, 5, 6, 7...
 
@@ -57,7 +62,9 @@ extern uint8_t nunchuk_data[6];
 extern volatile uint32_t timeoutCntGen; // global counter for general timeout counter
 extern volatile uint8_t  timeoutFlgGen; // global flag for general timeout counter
 extern volatile uint32_t main_loop_counter;
-
+uint8_t hall_ul = 0;
+uint8_t hall_vl = 0;
+uint8_t hall_wl = 0;
 #if defined(CONTROL_PPM_LEFT) || defined(CONTROL_PPM_RIGHT)
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
@@ -98,7 +105,7 @@ InputStruct input2[INPUTS_NR] = { {0, 0, 0, PRI_INPUT2}, {0, 0, 0, AUX_INPUT2} }
 InputStruct input1[INPUTS_NR] = { {0, 0, 0, PRI_INPUT1} };
 InputStruct input2[INPUTS_NR] = { {0, 0, 0, PRI_INPUT2} };
 #endif
-
+ 
 int16_t  speedAvg;                      // average measured speed
 int16_t  speedAvgAbs;                   // average measured speed in absolute
 uint8_t  timeoutFlgADC    = 0;          // Timeout Flag for ADC Protection:    0 = OK, 1 = Problem detected (line disconnected or wrong ADC data)
@@ -231,8 +238,15 @@ static uint8_t standstillAcv = 0;
 
 void BLDC_Init(void) {
   /* Set BLDC controller parameters */ 
+  #ifdef ENCODER
+  rtP_Left.b_angleMeasEna       = 1;            // Motor angle input: 0 = estimated angle, 1 = measured angle (e.g. if encoder is available)
+            hall_ul = 0;
+            hall_vl = 1;
+            hall_wl = 0;
+   #else
   rtP_Left.b_angleMeasEna       = 0;            // Motor angle input: 0 = estimated angle, 1 = measured angle (e.g. if encoder is available)
-  rtP_Left.z_selPhaCurMeasABC   = 0;            // Left motor measured current phases {Green, Blue} = {iA, iB} -> do NOT change
+   #endif
+  rtP_Left.z_selPhaCurMeasABC   = 0;            // Left motor measured current phases {Blue, Yellow} = {iB, iC} -> do NOT change
   rtP_Left.z_ctrlTypSel         = CTRL_TYP_SEL;
   rtP_Left.b_diagEna            = DIAG_ENA;
   rtP_Left.i_max                = (I_MOT_MAX * A2BIT_CONV) << 4;        // fixdt(1,16,4)
@@ -244,7 +258,7 @@ void BLDC_Init(void) {
   rtP_Left.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
 
   rtP_Right                     = rtP_Left;     // Copy the Left motor parameters to the Right motor parameters
-  rtP_Right.z_selPhaCurMeasABC  = 1;            // Right motor measured current phases {Blue, Yellow} = {iB, iC} -> do NOT change
+  rtP_Right.z_selPhaCurMeasABC  = 1;            // Right motor measured current phases {Green, Blue} = {iA, iB} -> do NOT change
 
   /* Pack LEFT motor data into RTM */
   rtM_Left->defaultParam        = &rtP_Left;
@@ -412,6 +426,192 @@ void UART_DisableRxErrors(UART_HandleTypeDef *huart)
   CLEAR_BIT(huart->Instance->CR3, USART_CR3_EIE);     /* Disable EIE (Frame error, noise error, overrun error) interrupts */
 }
 #endif
+
+/* =========================== Encoder Functions =========================== */
+#if defined (ENCODER)
+
+  
+
+void Encoder_Init(void) {
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_TIM4_CLK_ENABLE();
+
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    // Channel A
+    GPIO_InitStruct.Pin = ENCODER_CHA_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(ENCODER_CHA_PORT, &GPIO_InitStruct);
+
+    // Channel B
+    GPIO_InitStruct.Pin = ENCODER_CHB_PIN;
+    HAL_GPIO_Init(ENCODER_CHB_PORT, &GPIO_InitStruct);
+
+    encoder_handle.Init.Period = ENCODER_CPR - 1;
+    encoder_handle.Init.Prescaler = 0;
+    encoder_handle.Init.ClockDivision = 0;
+    encoder_handle.Init.CounterMode = TIM_COUNTERMODE_UP;
+    encoder_handle.Init.RepetitionCounter = 0;
+    encoder_handle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+
+    TIM_Encoder_InitTypeDef encoder_config;
+
+    encoder_config.EncoderMode = TIM_ENCODERMODE_TI12;
+
+    encoder_config.IC1Polarity = TIM_ICPOLARITY_RISING;
+    encoder_config.IC1Selection = TIM_ICSELECTION_DIRECTTI;
+    encoder_config.IC1Prescaler = TIM_ICPSC_DIV1;
+    encoder_config.IC1Filter = 0;
+
+    encoder_config.IC2Polarity = TIM_ICPOLARITY_RISING;
+    encoder_config.IC2Selection = TIM_ICSELECTION_DIRECTTI;
+    encoder_config.IC2Prescaler = TIM_ICPSC_DIV1;
+    encoder_config.IC2Filter = 0;
+
+    encoder_handle.Instance = ENCODER_TIMER;
+
+    if (HAL_TIM_Encoder_Init(&encoder_handle, &encoder_config) != HAL_OK) {
+        encoder.ini = false;
+        return;
+    }
+     if (HAL_TIM_Encoder_Start(&encoder_handle, TIM_CHANNEL_ALL) != HAL_OK) {
+        encoder.ini = false;
+        return;
+    }
+    
+    // Initialize encoder state
+    encoder.ini = true;
+    encoder.ali = false;
+    encoder.offset = 0;
+    encoder.direction = 1;
+    encoder.current_count = 0;
+    encoder.aligned_count = 0;
+    encoder.mech_angle_deg = 0;
+    
+    // Initialize alignment state variables
+    encoder.align_state = 0;
+    encoder.align_timer = 0;
+    encoder.align_start_time = 0;
+    encoder.align_step_counter = 0;
+    encoder.align_ini_pos = 0;
+    encoder.align_sequence_step = 0;
+}
+
+
+
+// Start non-blocking encoder alignment sequence
+void Encoder_Align_Start(void) {
+    if (encoder.align_state != 0) {
+        return; // Alignment already in progress
+    }
+    
+    enable = 1  ;
+    rtP_Left.b_diagEna        = 1; // Disable diagnostics during alignment
+    rtP_Left.b_angleMeasEna       = 0;
+    encoder.align_state = 1; // Start alignment sequence
+    encoder.align_timer = 0;
+    encoder.align_start_time = buzzerTimer;
+    encoder.align_step_counter = 0;
+    encoder.align_sequence_step = 0;
+    encoder.align_ini_pos = encoder_handle.Instance->CNT;
+    // Set motor to open loop mode
+    ctrlModReq = 1;
+    ctrlModReqRaw = ctrlModReq;
+    rtP_Left.z_ctrlTypSel = 0;
+    encoder.align_inpTgt = ALIGNMENT_VOLTAGE; 
+}
+
+// Non-blocking encoder alignment state machine - call from main loop
+void Encoder_Align(void) {
+    if (encoder.align_state == 0) {
+        return; // No alignment in progress
+    }
+    
+    // Hall sensor sequence for stepping through z_pos 0-5
+    static const uint8_t hall_sequence[6][3] = {
+        {0,1,0}, // Hall = 1 -> z_pos = 2 (step 0)
+        {0,1,1}, // Hall = 3 -> z_pos = 1 (step 1)
+        {0,0,1}, // Hall = 2 -> z_pos = 2 (step 2)  
+        {1,0,1}, // Hall = 6 -> z_pos = 5 (step 3)
+        {1,0,0}, // Hall = 4 -> z_pos = 4 (step 4)
+        {1,1,0}  // Hall = 5 -> z_pos = 3 (step 5)
+
+    };
+    
+    uint32_t current_time = buzzerTimer;
+    
+    switch (encoder.align_state) {
+        case 1: // Alignment sequence - move through hall positions
+            
+            if ((current_time - encoder.align_timer) >= 500) {
+                encoder.align_timer = current_time;
+                encoder.align_sequence_step = (encoder.align_step_counter / 10) % 6;
+                
+                hall_ul = hall_sequence[encoder.align_sequence_step][0];
+                hall_vl = hall_sequence[encoder.align_sequence_step][1];
+                hall_wl = hall_sequence[encoder.align_sequence_step][2];
+                
+                encoder.align_step_counter++;
+                
+                
+                if (encoder.align_step_counter >= 350) {
+                    encoder.align_state = 2; 
+                    encoder.align_timer = current_time;
+                }
+            }
+            break;
+            
+        case 2: 
+            if ((current_time - encoder.align_timer) >= 8000) { // 500ms * 16 ticks/ms
+                encoder.align_state = 3; // Move to calculation phase
+            }
+            break;
+
+        case 3: // Calculate alignment and finish
+            // Stop motor
+            
+            encoder.align_inpTgt = 0; // Aligment Power
+            
+            // Calculate offset
+            encoder.offset = encoder_handle.Instance->CNT;
+            
+            // Determine direction
+            int32_t encoder_movement = encoder.align_ini_pos - encoder.offset;
+            // Handle encoder wraparound
+            if (encoder_movement > (ENCODER_CPR / 2)) {
+                encoder_movement -= ENCODER_CPR;
+            } else if (encoder_movement < -(ENCODER_CPR / 2)) {
+                encoder_movement += ENCODER_CPR;
+            }
+            
+            // Determine direction: 1 if positive movement (CW), 0 if negative (CCW)
+            encoder.direction = (encoder_movement > 0) ? 1 : 0;
+            
+            // Calculate 30 electrical degrees offset (30° * pole_pairs / 360° * ENCODER_CPR)
+            // Assuming 15 pole pairs (30 poles), 30° elec = 2° mechanical
+            int32_t offset_30_elec = (2 * ENCODER_CPR) / 360;
+            encoder.offset = encoder.offset - offset_30_elec;
+            
+            // Mark alignment complete
+            encoder.ali = true;
+            encoder.align_state = 0; // Reset state machine
+            
+            // Return to default control mode
+            rtP_Left.z_ctrlTypSel = FOC_CTRL;
+            ctrlModReq = CTRL_MOD_REQ;
+            ctrlModReqRaw = ctrlModReq;
+            rtP_Left.b_angleMeasEna = 1;
+            rtP_Left.b_diagEna = DIAG_ENA; // Re-enable diagnostics
+            break;
+            
+        default:
+            encoder.align_state = 0; // Reset on invalid state
+            break;
+    }
+}
+
+#endif // ENCODER
 
 
 /* =========================== General Functions =========================== */
@@ -1027,7 +1227,23 @@ void handleTimeout(void) {
         #endif
       }
     #endif
+#ifdef ENCODER
+    // In case of timeout bring the system to a Safe State
+    if ((timeoutFlgADC || timeoutFlgSerial || timeoutFlgGen) && (!encoder.align_state)) {
+      ctrlModReq  = OPEN_MODE;                                          // Request OPEN_MODE. This will bring the motor power to 0 in a controlled way
+      input1[inIdx].cmd  = 0;
+      input2[inIdx].cmd  = 0;
+    } else {
+      ctrlModReq  = ctrlModReqRaw;                                      // Follow the Mode request
+    }
 
+    // Beep in case of Input index change
+    if (inIdx && !inIdx_prev) {                                         // rising edge
+      beepShort(8);
+    } else if (!inIdx && inIdx_prev) {                                  // falling edge
+      beepShort(18);
+    }
+#else
     // In case of timeout bring the system to a Safe State
     if (timeoutFlgADC || timeoutFlgSerial || timeoutFlgGen) {
       ctrlModReq  = OPEN_MODE;                                          // Request OPEN_MODE. This will bring the motor power to 0 in a controlled way
@@ -1043,6 +1259,7 @@ void handleTimeout(void) {
     } else if (!inIdx && inIdx_prev) {                                  // falling edge
       beepShort(18);
     }
+    #endif
 }
 
  /*
