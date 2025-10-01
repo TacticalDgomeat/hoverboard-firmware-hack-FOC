@@ -78,17 +78,14 @@ typedef struct {
   int32_t mech_angle_deg;
   int16_t align_inpTgt; // in util.c or as part of encoder struct
   // Non-blocking alignment state variables
-  uint8_t align_state;        // Current alignment state (0=inactive, 1=sequence, 2=return, 3=wait, 4=calc)
-  uint32_t align_timer;       // Timer for alignment sequence timing
-  uint32_t align_start_time;  // Start time for alignment
-  uint16_t align_step_counter;// Step counter for alignment sequence
-  int32_t align_ini_pos;      // Initial encoder position before alignment
-  uint8_t align_sequence_step;// Current step in hall sequence
-  // Direct electrical angle rotation variables
-  int16_T elec_angle_fixdt;   // Current electrical angle in fixdt(1,16,4) format (scaled by 16)
-  uint8_t rotation_count;     // Number of complete rotations completed (0-7)
-  uint32_t angle_step_timer;  // Timer for angle stepping
-  float angle_increment;      // Angle increment per step for smooth rotation
+  uint8_t align_state;               // Current alignment state (0=inactive, 1=power_ramp, 2=rotation, 3=high_power)
+  uint32_t align_timer;              // Timer for alignment sequence timing
+  uint32_t align_start_time;         // Start time for alignment
+  int32_t align_ini_pos;             // Initial encoder position before alignment
+  // Mechanical angle simulation variables (integer only)
+  int32_t simulated_mech_count;      // Simulated encoder count for mechanical angle
+  int32_t count_increment_x1000;    // Count increment per ms * 1000 (for precision)
+  uint32_t power_ramp_timer;         // Timer for power ramping phases
 } SensorState;
 extern SensorState encoder;
     uint8_t hall_ul;
