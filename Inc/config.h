@@ -670,7 +670,7 @@
 #define HOCP                        // Tie PA6/PB12 hardware over-current signals into TIM1/TIM8 break inputs
 #define BEEPER_OFF
 #define ENCODER_X
-#define ENCODER_Y
+//#define ENCODER_Y
 #define INTBRK_L_EN
 //#define EXTBRK_EN                   // Enable external braking resistor pin
 #ifdef EXTBRK_EN
@@ -720,8 +720,8 @@
 #undef FIELD_WEAK_ENA
 #define FIELD_WEAK_ENA           0 
 //#define RC_PWM_RIGHT           0         // use RC PWM as input on the RIGHT cable.  Number indicates priority for dual-input. Disable DEBUG_SERIAL_USART3!
-//#define HW_PWM                   0 
-#define SW_PWM_RIGHT           0         // UsingPWM input capture on PB10 and PB11 (duty cycle mapped to 0 to -16000, 0, 16000,)
+#define HW_PWM                   0 
+//#define SW_PWM_RIGHT           0         // UsingPWM input capture on PB10 and PB11 (duty cycle mapped to 0 to -16000, 0, 16000,)
 //#define SW_PWM_LEFT            0 
 //#define CONTROL_PPM_LEFT 0
 //#define PPM_NUM_CHANNELS 1
