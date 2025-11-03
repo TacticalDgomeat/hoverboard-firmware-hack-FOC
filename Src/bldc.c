@@ -232,9 +232,10 @@ void DMA1_Channel1_IRQHandler(void) {
        
     }
     if (encoder_y.ali){
-     encoder_y.aligned_count = encoder_y_handle.Instance->CNT;
-    if (encoder_y.direction == 0) {
-        encoder_y.aligned_count = -encoder_y.aligned_count;
+     if (encoder_y.direction == 1) {
+      encoder_y.aligned_count = encoder_y_handle.Instance->CNT;
+    }else {
+      encoder_y.aligned_count = ENCODER_Y_CPR - encoder_y_handle.Instance->CNT;
     }
     rtU_Left.a_mechAngle = (encoder_y.aligned_count * 23040) / (uint32_t)ENCODER_Y_CPR;
     // Angle input in DEGREES [0,360] in fixdt(1,16,4) data type. If `angle` is float use `= (int16_t)floor(angle * 16.0F)` If `angle` is integer use `= (int16_t)(angle << 4)`

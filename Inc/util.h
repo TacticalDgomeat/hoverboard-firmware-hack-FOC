@@ -86,11 +86,15 @@ typedef struct {
   int32_t align_zero_pos;            
   int32_t align_target_pos;          // Target position to return to after high-power phase
   uint32_t align_move_start;         // Timestamp when the move-back began
-  int32_t align_move_ini_pos;        // Starting emulated position for the move-back
+  int32_t align_total_ini_pos;        // Starting emulated position for the move-back
+  int32_t align_total_mid_pos;
+  int32_t align_total_end_pos;
   // Mechanical angle simulation variables (integer only)
   int32_t emulated_mech_count;      // emulated encoder count for mechanical angle
   int32_t count_increment_x1000;    // Count increment per tick * 1000 (for precision)
   uint32_t power_ramp_timer;         // Timer for power ramping phases
+  int32_t full_rotations;
+  int32_t count_prev;
 } SensorState;
 #endif
 
@@ -105,6 +109,10 @@ void handle_x_rotation_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t 
 void handle_x_high_power_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t current_time);
 void handle_x_move_back_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t move_ms, uint32_t current_time);
 void finalize_x_alignment(void);
+int32_t get_x_TotalCount(void);
+void count_x_update(void);
+int32_t get_y_TotalCount(void);
+void count_y_update(void);
 #endif
 
 #ifdef ENCODER_Y

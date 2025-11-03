@@ -658,6 +658,7 @@ void Encoder_X_Init(void) {
   encoder_x.direction = 1;
   encoder_x.aligned_count = 0;
   encoder_x.ENCODER_COUNT = 0;
+  encoder_x.full_rotations = 0;
     
     // Initialize alignment state variables
   encoder_x.align_state = 0;
@@ -680,6 +681,7 @@ void Encoder_X_Align_Start(void) {
   encoder_x.align_timer = 0;
   encoder_x.align_start_time = buzzerTimer;
   encoder_x.align_ini_pos = encoder_x_handle.Instance->CNT;
+  encoder_x.align_total_ini_pos = get_x_TotalCount();
     // Initialize simulation variables
   // Calculate count increment for 5.256 electrical rotations in 3000ms (5 + 92°/360°)
   // This compensates for the electrical offset to naturally reach 0° electrical  
@@ -690,22 +692,16 @@ void Encoder_X_Align_Start(void) {
   // Store as per-tick * 1000 for precision: (0.3504 * ENCODER_Y_CPR * 1000) / 48000
   // Using integer math: (3504 * ENCODER_Y_CPR * 1000) / (10000 * 48000) = (3504 * ENCODER_Y_CPR) / 480000
      encoder_x.count_increment_x1000 = (int32_t)((((int64_t)280) * ENCODER_X_CPR) / 48000);
-    
-    
     encoder_x.align_inpTgt = 0; // Start with 0 power, will ramp up
-    
-    
-    //ctrlModReq = TORQ;
-    //ctrlModReqRaw = ctrlModReq;
-    //rtP_Left.z_ctrlTypSel = FOC_CTRL;
-    //encoder.align_inpTgt = ALIGNMENT_X_POWER;
 }
 
 // Non-blocking encoder alignment with mechanical angle simulation - call from main loop
 void Encoder_X_Align(void) {
     uint32_t current_time = buzzerTimer;
     uint32_t elapsed_ticks = current_time - encoder_x.align_start_time;
-    encoder_x.ENCODER_COUNT = encoder_x_handle.Instance->CNT;
+    count_x_update();
+    
+
     const uint32_t RAMP_MS = T_MS(125);
     const uint32_t MOVE_MS = T_MS(1500);
     
@@ -728,6 +724,7 @@ void Encoder_X_Align(void) {
     }
 }
 
+
  void handle_x_rotation_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t move_ms, uint32_t current_time) {
     // Power control: ramp up, full speed, then ramp down
     if (elapsed_ticks < ramp_ms) {
@@ -748,14 +745,13 @@ void Encoder_X_Align(void) {
     encoder_x.emulated_mech_count = encoder_x.align_ini_pos + total_increment;
     encoder_x.emulated_mech_count = normalize_x_encoder_count(encoder_x.emulated_mech_count);
     } else {
-        // Rotation complete - snap to 30° electrical position
+        // Rotation complete - snap to 0° electrical position
         int32_t counts_per_elec_cycle = ENCODER_X_CPR / N_POLE_PAIRS;
-         encoder_x.offset = (2 * ENCODER_X_CPR / 360)+1;
+         encoder_x.offset = (ENCODER_X_CPR / N_POLE_PAIRS/4); //90 degrees offset
 
         int32_t current_elec_cycle = encoder_x.emulated_mech_count / counts_per_elec_cycle;
-        encoder_x.emulated_mech_count = current_elec_cycle * counts_per_elec_cycle+encoder_x.offset;
+        encoder_x.emulated_mech_count = current_elec_cycle * counts_per_elec_cycle;
         encoder_x.emulated_mech_count = normalize_x_encoder_count(encoder_x.emulated_mech_count);
-
         encoder_x.align_state = 2;
         encoder_x.align_start_time = current_time;
     }
@@ -769,14 +765,10 @@ void Encoder_X_Align(void) {
         // Hold at double power
         encoder_x.align_inpTgt = ALIGNMENT_X_POWER * 2;
     } else {
-        
-         // Calculate direction
-       int32_t movement = encoder_x.align_ini_pos - encoder_x_handle.Instance->CNT;
-       encoder_x.direction = (movement > 0) ? 1 : 0;
-    // Record final position and move to next phase
-    
-        __HAL_TIM_SET_COUNTER(&encoder_x_handle, encoder_x.emulated_mech_count+encoder_x.offset); //add a bit of offset to for anticogging
-        encoder_x.align_zero_pos = encoder_x_handle.Instance->CNT;
+       
+        __HAL_TIM_SET_COUNTER(&encoder_x_handle, encoder_x.emulated_mech_count+encoder_x.offset); //+90 degree offset align to Q axis
+        encoder_x.align_zero_pos = encoder_x.emulated_mech_count;
+        encoder_x.align_total_mid_pos = get_x_TotalCount();
         encoder_x.align_start_time = current_time;
         encoder_x.align_state = 3;
     }
@@ -813,7 +805,17 @@ void Encoder_X_Align(void) {
         }
     }
 }
+void count_x_update() {
+    encoder_x.ENCODER_COUNT = encoder_x_handle.Instance->CNT;
+    int32_t count = encoder_x.ENCODER_COUNT - encoder_x.count_prev;
+    // if overflow happened track it as full rotation
+    if(abs(count) > (ENCODER_X_CPR/2) ) encoder_x.full_rotations += ( count > 0 ) ? -1 : 1; 
+    encoder_x.count_prev = encoder_x.ENCODER_COUNT;
+}
 
+int32_t get_x_TotalCount(void){
+return encoder_x.full_rotations * ENCODER_X_CPR + encoder_x.count_prev;
+}
   int32_t normalize_x_encoder_count(int32_t count) {
     count %= ENCODER_X_CPR;
     if (count < 0) count += ENCODER_X_CPR;
@@ -821,12 +823,28 @@ void Encoder_X_Align(void) {
 }
 
  void finalize_x_alignment(void) {
-    // Calculate offset
-
+         // Calculate direction
+       int32_t MIN_MOVMENT = (ENCODER_X_CPR / 15) * 1;
+        encoder_x.align_total_end_pos = get_x_TotalCount();
+       int32_t movement =  abs(encoder_x.align_total_mid_pos - encoder_x.align_total_ini_pos);
+       
+       if (abs(movement) < MIN_MOVMENT){
+        encoder_x.align_fault = true;
+        encoder_x.ali = false;
+        encoder_x.align_state = 0;
+       } else if(encoder_x.align_total_mid_pos < encoder_x.align_total_end_pos) {
+         encoder_x.direction = 0;
         encoder_x.align_fault = false;
         encoder_x.ali = true;
         rtP_Right.b_diagEna = DIAG_ENA;
         encoder_x.align_state = 0;
+       }else{
+        encoder_x.direction = 1;
+        encoder_x.align_fault = false;
+        encoder_x.ali = true;
+        rtP_Right.b_diagEna = DIAG_ENA;
+        encoder_x.align_state = 0;
+       }    
 }
 #endif // ENCODER_X
 
@@ -886,8 +904,8 @@ void Encoder_Y_Init(void) {
   encoder_y.offset = 0;
   encoder_y.direction = 1;
   encoder_y.aligned_count = 0;
-  encoder_y.mech_angle_deg = 0;
-    
+  encoder_y.ENCODER_COUNT = 0;
+  encoder_y.full_rotations = 0;
     // Initialize alignment state variables
   encoder_y.align_state = 0;
   encoder_y.align_ini_pos = 0;
@@ -913,9 +931,8 @@ void Encoder_Y_Align_Start(void) {
   encoder_y.align_timer = 0;
   encoder_y.align_start_time = buzzerTimer;
   encoder_y.align_ini_pos = encoder_y_handle.Instance->CNT;
+  encoder_y.align_total_ini_pos = get_y_TotalCount();
     // Initialize simulation variables
-  encoder_y.power_ramp_timer = buzzerTimer;
-    
   // Calculate count increment for 5.256 electrical rotations in 3000ms (5 + 92°/360°)
   // This compensates for the electrical offset to naturally reach 0° electrical  
   // 5.256 electrical rotations = 5.256/15 mechanical rotations = 0.3504 mechanical rotation
@@ -924,22 +941,16 @@ void Encoder_Y_Align_Start(void) {
   // Increment per tick = (0.3504 * ENCODER_Y_CPR) / 48000
   // Store as per-tick * 1000 for precision: (0.3504 * ENCODER_Y_CPR * 1000) / 48000
   // Using integer math: (3504 * ENCODER_Y_CPR * 1000) / (10000 * 48000) = (3504 * ENCODER_Y_CPR) / 480000
-  encoder_y.count_increment_x1000 = (int32_t)((((int64_t)280) * ENCODER_Y_CPR) / 480000);
-    
-    
+  encoder_y.count_increment_x1000 = (int32_t)((((int64_t)280) * ENCODER_Y_CPR) / 48000);
     encoder_y.align_inpTgt = 0; // Start with 0 power, will ramp up
-    
-    
-    //ctrlModReq = TORQ;
-    //ctrlModReqRaw = ctrlModReq;
-    //rtP_Left.z_ctrlTypSel = FOC_CTRL;
-    //encoder.align_inpTgt = ALIGNMENT_Y_POWER;
 }
 
 // Non-blocking encoder alignment with mechanical angle simulation - call from main loop
 void Encoder_Y_Align(void) {
     uint32_t current_time = buzzerTimer;
     uint32_t elapsed_ticks = current_time - encoder_y.align_start_time;
+  // Keep encoder total/count tracking up-to-date (same behavior as Encoder_X_Align)
+  count_y_update();
     
     const uint32_t RAMP_MS = T_MS(125);
     const uint32_t MOVE_MS = T_MS(1500);
@@ -983,12 +994,12 @@ void Encoder_Y_Align(void) {
     encoder_y.emulated_mech_count = encoder_y.align_ini_pos + total_increment;
     encoder_y.emulated_mech_count = normalize_y_encoder_count(encoder_y.emulated_mech_count);
     } else {
-        // Rotation complete - snap to 30° electrical position
+        // Rotation complete - snap to 0° electrical position
         int32_t counts_per_elec_cycle = ENCODER_Y_CPR / N_POLE_PAIRS;
-        encoder_y.offset = (2 * ENCODER_Y_CPR / 360)+1;  // 30° electrical = 2° mechanical + 5 counts
+        encoder_y.offset = (ENCODER_Y_CPR / N_POLE_PAIRS/4);  // 90° electrical
     
         int32_t current_elec_cycle = encoder_y.emulated_mech_count / counts_per_elec_cycle;
-        encoder_y.emulated_mech_count = current_elec_cycle * counts_per_elec_cycle + encoder_y.offset;
+        encoder_y.emulated_mech_count = current_elec_cycle * counts_per_elec_cycle;
         encoder_y.emulated_mech_count = normalize_y_encoder_count(encoder_y.emulated_mech_count);
 
         encoder_y.align_state = 2;
@@ -1003,14 +1014,11 @@ void Encoder_Y_Align(void) {
     } else if (elapsed_ticks < T_MS(1000)) {
         // Hold at double power
         encoder_y.align_inpTgt = ALIGNMENT_Y_POWER * 2;
-    } else {
-        
-         // Calculate direction
-       int32_t movement = encoder_y.align_ini_pos - encoder_y_handle.Instance->CNT;
-       encoder_y.direction = (movement > 0) ? 1 : 0;
+  } else {
     // Record final position and move to next phase
         __HAL_TIM_SET_COUNTER(&encoder_y_handle, encoder_y.emulated_mech_count + encoder_y.offset);
-        encoder_y.align_zero_pos = encoder_y_handle.Instance->CNT;
+        encoder_y.align_zero_pos = encoder_y.emulated_mech_count;
+        encoder_y.align_total_mid_pos = get_y_TotalCount();
         encoder_y.align_start_time = current_time;
         encoder_y.align_state = 3;
     }
@@ -1047,7 +1055,16 @@ void Encoder_Y_Align(void) {
         }
     }
 }
-
+void count_y_update() {
+    encoder_y.ENCODER_COUNT = encoder_y_handle.Instance->CNT;
+    int32_t count = encoder_y.ENCODER_COUNT - encoder_y.count_prev;
+    // if overflow happened track it as full rotation
+    if(abs(count) > (ENCODER_Y_CPR/2) ) encoder_y.full_rotations += ( count > 0 ) ? -1 : 1; 
+    encoder_y.count_prev = encoder_y.ENCODER_COUNT;
+}
+int32_t get_y_TotalCount(void){
+return encoder_y.full_rotations * ENCODER_Y_CPR + encoder_y.count_prev;
+}
   int32_t normalize_y_encoder_count(int32_t count) {
     count %= ENCODER_Y_CPR;
     if (count < 0) count += ENCODER_Y_CPR;
@@ -1056,11 +1073,27 @@ void Encoder_Y_Align(void) {
 
  void finalize_y_alignment(void) {
     // Calculate offset
-
+       int32_t MIN_MOVMENT = (ENCODER_Y_CPR / 15) * 1;
+        encoder_y.align_total_end_pos = get_y_TotalCount();
+       int32_t movement =  abs(encoder_y.align_total_mid_pos - encoder_y.align_total_ini_pos);
+       
+       if (abs(movement) < MIN_MOVMENT){
+        encoder_y.align_fault = true;
+        encoder_y.ali = false;
+        encoder_y.align_state = 0;
+       } else if(encoder_y.align_total_mid_pos < encoder_y.align_total_end_pos) {
+         encoder_y.direction = 0;
         encoder_y.align_fault = false;
         encoder_y.ali = true;
-        rtP_Right.b_diagEna = DIAG_ENA;
+        rtP_Left.b_diagEna = DIAG_ENA;
         encoder_y.align_state = 0;
+       }else{
+        encoder_y.direction = 1;
+        encoder_y.align_fault = false;
+        encoder_y.ali = true;
+        rtP_Left.b_diagEna = DIAG_ENA;
+        encoder_y.align_state = 0;
+       }    
 }
 
 #endif // ENCODER_Y
