@@ -307,8 +307,8 @@ typedef struct {  // Structure for ADC3 values
   #if defined(ANALOG_BUTTON)
   uint16_t button;
 #endif
-  uint16_t r_tx2;
-  uint16_t r_rx2;
+  uint16_t l_tx2;
+  uint16_t l_rx2;
   uint16_t batt1;
 } adc3_named_samples_t;
 #ifndef ANALOG_BUTTON

@@ -721,6 +721,7 @@
 #define FIELD_WEAK_ENA           0 
 //#define RC_PWM_RIGHT           0         // use RC PWM as input on the RIGHT cable.  Number indicates priority for dual-input. Disable DEBUG_SERIAL_USART3!
 #define HW_PWM                   0 
+//#define CONTROL_ADC              1 
 //#define SW_PWM_RIGHT           0         // UsingPWM input capture on PB10 and PB11 (duty cycle mapped to 0 to -16000, 0, 16000,)
 //#define SW_PWM_LEFT            0 
 //#define CONTROL_PPM_LEFT 0

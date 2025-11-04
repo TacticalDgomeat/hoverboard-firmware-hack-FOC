@@ -1561,23 +1561,24 @@ void calcInputCmd(InputStruct *in, int16_t out_min, int16_t out_max) {
  * Function to read the Input Raw values from various input devices
  */
 void readInputRaw(void) {
-    #ifdef CONTROL_ADC
-    if (inIdx == CONTROL_ADC) {
-      #ifdef ADC_ALTERNATE_CONNECT
-  input1[inIdx].raw = adc_buffer.adc12.value.l_rx2;
-  input2[inIdx].raw = adc_buffer.adc12.value.l_tx2;
-      #else
-  input1[inIdx].raw = adc_buffer.adc12.value.l_tx2;
-  input2[inIdx].raw = adc_buffer.adc12.value.l_rx2;
-      #endif
-    }
+  uint8_t idx = (inIdx < INPUTS_NR) ? inIdx : 0; /* safe index to avoid out-of-bounds when INPUTS_NR==1 */
+  #ifdef CONTROL_ADC
+  if (inIdx == CONTROL_ADC) {
+    #ifdef ADC_ALTERNATE_CONNECT
+  input1[idx].raw = adc_buffer.adc3.value.l_rx2;
+  input2[idx].raw = adc_buffer.adc3.value.l_tx2;
+    #else
+  input1[idx].raw = adc_buffer.adc3.value.l_tx2;
+  input2[idx].raw = adc_buffer.adc3.value.l_rx2;
     #endif
+  }
+  #endif
 
     #if defined(CONTROL_NUNCHUK) || defined(SUPPORT_NUNCHUK)
     if (Nunchuk_Read() == NUNCHUK_CONNECTED) {
       if (inIdx == CONTROL_NUNCHUK) {
-        input1[inIdx].raw = (nunchuk_data[0] - 127) * 8; // X axis 0-255
-        input2[inIdx].raw = (nunchuk_data[1] - 128) * 8; // Y axis 0-255
+        input1[idx].raw = (nunchuk_data[0] - 127) * 8; // X axis 0-255
+        input2[idx].raw = (nunchuk_data[1] - 128) * 8; // Y axis 0-255
       }
       #ifdef SUPPORT_BUTTONS
         button1 = (uint8_t)nunchuk_data[5] & 1;
@@ -1592,11 +1593,11 @@ void readInputRaw(void) {
         for (uint8_t i = 0; i < (IBUS_NUM_CHANNELS * 2); i+=2) {
           ibusL_captured_value[(i/2)] = CLAMP(commandL.channels[i] + (commandL.channels[i+1] << 8) - 1000, 0, INPUT_MAX); // 1000-2000 -> 0-1000
         }
-        input1[inIdx].raw = (ibusL_captured_value[0] - 500) * 2;
-        input2[inIdx].raw = (ibusL_captured_value[1] - 500) * 2; 
+        input1[idx].raw = (ibusL_captured_value[0] - 500) * 2;
+        input2[idx].raw = (ibusL_captured_value[1] - 500) * 2; 
       #else
-        input1[inIdx].raw = commandL.steer;
-        input2[inIdx].raw = commandL.speed;
+        input1[idx].raw = commandL.steer;
+        input2[idx].raw = commandL.speed;
       #endif
     }
     #endif
@@ -1621,27 +1622,27 @@ void readInputRaw(void) {
 
     #if defined(SIDEBOARD_SERIAL_USART2)
     if (inIdx == SIDEBOARD_SERIAL_USART2) {
-      input1[inIdx].raw = Sideboard_L.cmd1;
-      input2[inIdx].raw = Sideboard_L.cmd2;
+      input1[idx].raw = Sideboard_L.cmd1;
+      input2[idx].raw = Sideboard_L.cmd2;
     }
     #endif
     #if defined(SIDEBOARD_SERIAL_USART3)
     if (inIdx == SIDEBOARD_SERIAL_USART3) {
-      input1[inIdx].raw = Sideboard_R.cmd1;
-      input2[inIdx].raw = Sideboard_R.cmd2;
+      input1[idx].raw = Sideboard_R.cmd1;
+      input2[idx].raw = Sideboard_R.cmd2;
     }
     #endif
 
     #if defined(CONTROL_PPM_LEFT)
     if (inIdx == CONTROL_PPM_LEFT) {
-      input1[inIdx].raw = (ppm_captured_value[0] - 500) * 2;
-      input2[inIdx].raw = (ppm_captured_value[1] - 500) * 2;
+      input1[idx].raw = (ppm_captured_value[0] - 500) * 2;
+      input2[idx].raw = (ppm_captured_value[1] - 500) * 2;
     }
     #endif
     #if defined(CONTROL_PPM_RIGHT)
     if (inIdx == CONTROL_PPM_RIGHT) {
-      input1[inIdx].raw = (ppm_captured_value[0] - 500) * 2;
-      input2[inIdx].raw = (ppm_captured_value[1] - 500) * 2;
+      input1[idx].raw = (ppm_captured_value[0] - 500) * 2;
+      input2[idx].raw = (ppm_captured_value[1] - 500) * 2;
     }
     #endif
     #if (defined(CONTROL_PPM_LEFT) || defined(CONTROL_PPM_RIGHT)) && defined(SUPPORT_BUTTONS)
@@ -1651,42 +1652,42 @@ void readInputRaw(void) {
 
     #if defined(RC_PWM_LEFT)
     if (inIdx == RC_PWM_LEFT) {
-      input1[inIdx].raw = (pwm_captured_ch1_value - 500) * 2;
-      input2[inIdx].raw = (pwm_captured_ch2_value - 500) * 2;
+      input1[idx].raw = (pwm_captured_ch1_value - 500) * 2;
+      input2[idx].raw = (pwm_captured_ch2_value - 500) * 2;
     }
     #endif
     #if defined(RC_PWM_RIGHT)
     if (inIdx == RC_PWM_RIGHT) {
-      input1[inIdx].raw = (pwm_captured_ch1_value - 500) * 2;
-      input2[inIdx].raw = (pwm_captured_ch2_value - 500) * 2;
+      input1[idx].raw = (pwm_captured_ch1_value - 500) * 2;
+      input2[idx].raw = (pwm_captured_ch2_value - 500) * 2;
     }
     #endif
     #if defined(SW_PWM_RIGHT)
     if (inIdx == SW_PWM_RIGHT) {
-      input1[inIdx].raw = pwm_captured_ch1_value;
-      input2[inIdx].raw = pwm_captured_ch2_value;
+      input1[idx].raw = pwm_captured_ch1_value;
+      input2[idx].raw = pwm_captured_ch2_value;
     }
     #endif
     #if defined(SW_PWM_LEFT)
     if (inIdx == SW_PWM_LEFT) {
-      input1[inIdx].raw = pwm_captured_ch1_value;
-      input2[inIdx].raw = pwm_captured_ch2_value;
+      input1[idx].raw = pwm_captured_ch1_value;
+      input2[idx].raw = pwm_captured_ch2_value;
     }
     #endif
 #if defined(HW_PWM)
     if (inIdx == HW_PWM) {
-      input2[inIdx].raw = pwm_captured_ch2_value;                       
+      input2[idx].raw = pwm_captured_ch2_value;                       
     }
     #endif
     #ifdef VARIANT_TRANSPOTTER
-      #ifdef GAMETRAK_CONNECTION_NORMAL
-  input1[inIdx].cmd = adc_buffer.adc12.value.l_rx2;
-  input2[inIdx].cmd = adc_buffer.adc12.value.l_tx2;
-      #endif
-      #ifdef GAMETRAK_CONNECTION_ALTERNATE
-  input1[inIdx].cmd = adc_buffer.adc12.value.l_tx2;
-  input2[inIdx].cmd = adc_buffer.adc12.value.l_rx2;
-      #endif
+    #ifdef GAMETRAK_CONNECTION_NORMAL
+  input1[idx].cmd = adc_buffer.adc12.value.l_rx2;
+  input2[idx].cmd = adc_buffer.adc12.value.l_tx2;
+    #endif
+    #ifdef GAMETRAK_CONNECTION_ALTERNATE
+  input1[idx].cmd = adc_buffer.adc12.value.l_tx2;
+  input2[idx].cmd = adc_buffer.adc12.value.l_rx2;
+    #endif
     #endif
 }
 
@@ -1694,11 +1695,12 @@ void readInputRaw(void) {
  * Function to handle the ADC, UART and General timeout (Nunchuk, PPM, PWM)
  */
 void handleTimeout(void) {
+  uint8_t idx = (inIdx < INPUTS_NR) ? inIdx : 0; /* safe index to avoid out-of-bounds when INPUTS_NR==1 */
     #ifdef CONTROL_ADC
     if (inIdx == CONTROL_ADC) {
       // If input1 or Input2 is either below MIN - Threshold or above MAX + Threshold, ADC protection timeout
-      if (IN_RANGE(input1[inIdx].raw, input1[inIdx].min - ADC_PROTECT_THRESH, input1[inIdx].max + ADC_PROTECT_THRESH) &&
-          IN_RANGE(input2[inIdx].raw, input2[inIdx].min - ADC_PROTECT_THRESH, input2[inIdx].max + ADC_PROTECT_THRESH)) {
+    if (IN_RANGE(input1[idx].raw, input1[idx].min - ADC_PROTECT_THRESH, input1[idx].max + ADC_PROTECT_THRESH) &&
+      IN_RANGE(input2[idx].raw, input2[idx].min - ADC_PROTECT_THRESH, input2[idx].max + ADC_PROTECT_THRESH)) {
           timeoutFlgADC = 0;                            // Reset the timeout flag
           timeoutCntADC = 0;                            // Reset the timeout counter
       } else {
@@ -1785,8 +1787,8 @@ void handleTimeout(void) {
   // In case of timeout bring the system to a Safe State
   if ((timeoutFlgADC || timeoutFlgSerial || timeoutFlgGen || DLVPA() || overcurrent_fault()) && (!encoder_alignment_active())) {
       ctrlModReq  = OPEN_MODE;                                          // Request OPEN_MODE. This will bring the motor power to 0 in a controlled way
-      input1[inIdx].cmd  = 0;
-      input2[inIdx].cmd  = 0;
+  input1[idx].cmd  = 0;
+  input2[idx].cmd  = 0;
     } else {
       ctrlModReq  = ctrlModReqRaw;                                      // Follow the Mode request
     }
@@ -1801,8 +1803,8 @@ void handleTimeout(void) {
     // In case of timeout bring the system to a Safe State
     if (timeoutFlgADC || timeoutFlgSerial || timeoutFlgGen) {
       ctrlModReq  = OPEN_MODE;                                          // Request OPEN_MODE. This will bring the motor power to 0 in a controlled way
-      input1[inIdx].cmd  = 0;
-      input2[inIdx].cmd  = 0;
+  input1[idx].cmd  = 0;
+  input2[idx].cmd  = 0;
     } else {
       ctrlModReq  = ctrlModReqRaw;                                      // Follow the Mode request
     }
