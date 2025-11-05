@@ -701,7 +701,7 @@
   #define CTRL_TYP_SEL           FOC_CTRL   
   #define CTRL_MOD_REQ           TRQ_MODE  
   
-  #define TANK_STEERING  
+#define TANK_STEERING                    //each input controls each wheel
 #undef MOTOR_LEFT_ENA
 //#define MOTOR_LEFT_ENA                  // [-] Enable LEFT motor.  Comment-out if this motor is not needed to be operational
 #define MOTOR_RIGHT_ENA                 // [-] Enable RIGHT motor. Comment-out if this motor is not needed to be operational
@@ -713,7 +713,8 @@
 #undef N_MOT_MAX 
 #undef I_MOT_MAX 
 #define I_MOT_MAX                15              // [A] Maximum single motor current limit
-#define I_DC_MAX                 17              // [A] Maximum stage2 DC Link current limit for Commutation and Sinusoidal types (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
+#define I_DC_MAX                 17              // [A] Maximum stage2 DC Link current limit (Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
+#undef N_MOT_MAX
 #define N_MOT_MAX                2000            // [rpm] Maximum motor speed limit
 
 #define DC_LINK_WATCHDOG_ENABLE 

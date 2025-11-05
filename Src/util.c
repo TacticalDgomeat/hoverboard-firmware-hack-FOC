@@ -614,7 +614,7 @@ void Encoder_X_Init(void) {
     // Channel A
     GPIO_InitStruct.Pin = ENCODER_X_CHA_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_INPUT;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
     HAL_GPIO_Init(ENCODER_X_CHA_PORT, &GPIO_InitStruct);
 
     // Channel B
