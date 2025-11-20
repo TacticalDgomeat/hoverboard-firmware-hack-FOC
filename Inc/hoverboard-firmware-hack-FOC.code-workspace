@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../../../../Documents/PlatformIO/Projects/Simplefoc motordriver"
+		},
+		{
+			"path": "../../../../../Documents/PlatformIO/Projects/Motordriver"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"stdbool.h": "c",
+			"stm32f1xx_hal.h": "c",
+			"stm32f1xx.h": "c",
+			"limits": "c",
+			"bldc_controller.h": "c",
+			"defines.h": "c",
+			"rtwtypes.h": "c",
+			"setup.h": "c"
+		},
+		"github.copilot.chat.agent.thinkingTool": true
+	}
+}

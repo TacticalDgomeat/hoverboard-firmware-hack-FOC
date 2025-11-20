@@ -344,8 +344,9 @@ void DMA1_Channel1_IRQHandler(void) {
 
   //External Break Resistor Output Control
   #ifdef EXTBRK_EN
-  I_BusR = curR_DC + curL_DC - MAX_REGEN_CURRENT; // Total bus current
-  if (I_BusR > 2*BRKRESACT_SENS){ // If over max regen current, apply braking on left motor
+  I_BusR = curR_DC + curL_DC - MAX_REGEN_CURRENT; // Total bus current -2000 to +2000 out of +-40A
+  if (I_BusR > BRKRESACT_SENS){ // If over max regen current
+    
      EXT_PWM_BRK = CLAMP(((((int32_t)I_BusR * BRAKE_RESISTANCE * pwm_res) /(50*batVoltageCalib))) ,0, (((uint32_t)pwm_res*90)/100));
     }else{
      EXT_PWM_BRK = 0;

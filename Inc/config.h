@@ -78,7 +78,7 @@
 #define BAT_FILT_COEF           6553       // battery voltage filter coefficient in fixed-point. coef_fixedPoint = coef_floatingPoint * 2^16. In this case 655 = 0.01 * 2^16
 #define BAT_CALIB_REAL_VOLTAGE  3970      // input voltage measured by multimeter (multiplied by 100). In this case 43.00 V * 100 = 4300
 #define BAT_CALIB_ADC           1492      // adc-value measured by mainboard (value nr 5 on UART debug output)
-#define BAT_CELLS               5       // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
+#define BAT_CELLS               6       // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
 #define BAT_LVL2_ENABLE         0         // to beep or not to beep, 1 or 0
 #define BAT_LVL1_ENABLE         0         // to beep or not to beep, 1 or 0
 #define BAT_DEAD_ENABLE         1         // to poweroff or not to poweroff, 1 or 0
@@ -666,9 +666,9 @@
 /* ###### CONTROL VIA ENCODER ######
  * This variant is for using encoder for motor control.
 */
-#define GD32F103Rx              1   // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
+//#define GD32F103Rx              1   // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
 #define HOCP                        // Tie PA6/PB12 hardware over-current signals into TIM1/TIM8 break inputs
-#define BEEPER_OFF                  //use led as beeper
+//#define BEEPER_OFF                  //use led as beeper
 #define ENCODER_X                   //enable X encoder to right motor
 //#define ENCODER_Y                 //enable Y encoder to left motor
 #define INTBRK_L_EN                 //enable brake resistor control on PHASE A left side driver, do not disable if break reistor is connected 

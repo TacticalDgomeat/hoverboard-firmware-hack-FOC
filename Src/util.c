@@ -102,7 +102,7 @@ static void DcLinkWatchdog_ArmRise(void) {
   ADC_AnalogWDGConfTypeDef config;
   config.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
   config.HighThreshold = BAT_HIGH;
-  config.LowThreshold  = HARD_18V_COUNTS-200;   // around 15v
+  config.LowThreshold  = HARD_18V_COUNTS-300;   // around 15v
   config.Channel       = DCLINK_ADC_CHANNEL;
   config.ITMode        = ENABLE;
   HAL_ADC_AnalogWDGConfig(&hadc3, &config);
