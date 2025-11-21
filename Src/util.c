@@ -1946,7 +1946,7 @@ void usart3_rx_check(void)
       usart_process_debug(&rx_buffer_R[old_pos], pos - old_pos);        // Process data
     } else {                                                            // "Overflow" buffer mode
       usart_process_debug(&rx_buffer_R[old_pos], rx_buffer_R_len - old_pos);        // Process data
-      usart_process_debug(&rx_buffer_R[old_pos], pos);                           // Process data
+      usart_process_debug(&rx_buffer_R[0], pos);                           // Process data
     }
   }
   #endif // DEBUG_SERIAL_USART3
