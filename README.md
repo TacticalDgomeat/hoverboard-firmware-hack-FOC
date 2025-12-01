@@ -37,7 +37,7 @@ Wheelbase and Joystick project [Arduino-FFB-wheel](https://github.com/ranenbg/Ar
 
 Wheelbase compatible project [OpenFFB](https://github.com/Ultrawipf/OpenFFBoard)  by Yannick Richter 
 
-Any usb controller capable of outputting PWM and Reading ab encoder signals will work, in this case I am using Ranenbs's firmware with arduino pro micro.
+Any usb controller capable of outputting PWM and Reading ab encoder signals will work, in this case I am using Rane's firmware with arduino pro micro.
 For exact wiring connections and components to get check wiki [page](https://github.com/SiMachines/hoverboard-firmware-hack-FOC/wiki/Setup-Arduino%E2%80%90FFB%E2%80%90wheel-(Single-Axis))
 
 
