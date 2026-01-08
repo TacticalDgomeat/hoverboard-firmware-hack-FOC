@@ -54,7 +54,9 @@
       uint16_t  checksum;
     } SerialSideboard;
 #endif
-
+#if defined(HSPWM)
+int16_T HS_PWM;
+#endif
 // Input Structure
 typedef struct {
   int16_t   raw;    // raw input

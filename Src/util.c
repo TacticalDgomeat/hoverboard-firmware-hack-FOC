@@ -416,10 +416,10 @@ void BLDC_Init(void) {
   rtP_Left.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
   rtP_Left.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
   rtP_Left.n_polePairs          = N_POLE_PAIRS;                        // fixdt(1,16,4)
-  //rtP_Left.cf_idKi              = DI;                              // fixdt(1,16,4) ufix16_En16
-  //rtP_Left.cf_idKp              = DP;                              // fixdt(1,16,4) ufix16_En12
-  //rtP_Left.cf_iqKi              = DQ;                              // fixdt(1,16,4) ufix16_En16
-  //rtP_Left.cf_iqKp              = DQ;                              // fixdt(1,16,4) ufix16_En12
+  rtP_Left.cf_idKi              = DI;                             // Single
+  rtP_Left.cf_idKp              = DP;                              
+  rtP_Left.cf_iqKi              = QI;                              
+  rtP_Left.cf_iqKp              = QP;                              
 
   rtP_Right                     = rtP_Left;     // Copy the Left motor parameters to the Right motor parameters
   rtP_Right.z_selPhaCurMeasABC  = 1;            // Right motor measured current phases {Green, Blue} = {iA, iB} -> do NOT change

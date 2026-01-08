@@ -75,6 +75,7 @@ uint8_t        enable       = 0;        // initially motors are disabled for SAF
 static uint8_t enableFin    = 0;
 
 static uint16_t pwm_res;              /* Timer auto-reload value; set during initialization */
+ static volatile int ur, vr, wr;
 
 void BLDC_SetPwmResolution(uint16_t periodCounts) {
   pwm_res = periodCounts ? periodCounts : 1U;
@@ -190,7 +191,7 @@ void DMA1_Channel1_IRQHandler(void) {
   #ifndef INTBRK_L_EN
   int ul, vl, wl;
   #endif
-  int ur, vr, wr;
+  //int ur, vr, wr;
   static boolean_T OverrunFlag = false;
 
   /* Check for overrun */
@@ -303,7 +304,12 @@ void DMA1_Channel1_IRQHandler(void) {
 
      #ifdef ENCODER_X
     if (!encoder_x.align_state) {
+      #ifdef HSPWM
+      rtU_Right.r_inpTgt = HS_PWM;
+      #else
       rtU_Right.r_inpTgt = pwmr;
+      #endif
+
     } else {
       rtU_Right.r_inpTgt = encoder_x.align_inpTgt;
        emulated_mech_angle_deg = (encoder_x.emulated_mech_count * 23040) / (uint32_t)ENCODER_X_CPR;
@@ -328,17 +334,18 @@ void DMA1_Channel1_IRQHandler(void) {
     #endif
 
     /* Get motor outputs here */
-    ur            = rtY_Right.DC_phaA;
-    vr            = rtY_Right.DC_phaB;
-    wr            = rtY_Right.DC_phaC;
+    ur            = (uint16_t)CLAMP(rtY_Right.DC_phaA + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
+    vr            = (uint16_t)CLAMP(rtY_Right.DC_phaB + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
+    wr            = (uint16_t)CLAMP(rtY_Right.DC_phaC + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
  // errCodeRight  = rtY_Right.z_errCode;
  // motSpeedRight = rtY_Right.n_mot;
  // motAngleRight = rtY_Right.a_elecAngle;
 
     /* Apply commands */
-    RIGHT_TIM->RIGHT_TIM_U  = (uint16_t)CLAMP(ur + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
-    RIGHT_TIM->RIGHT_TIM_V  = (uint16_t)CLAMP(vr + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
-    RIGHT_TIM->RIGHT_TIM_W  = (uint16_t)CLAMP(wr + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
+    RIGHT_TIM->RIGHT_TIM_U  = ur;
+    RIGHT_TIM->RIGHT_TIM_V  = vr;
+    RIGHT_TIM->RIGHT_TIM_W  = wr;
+    
   // =================================================================
    
 
