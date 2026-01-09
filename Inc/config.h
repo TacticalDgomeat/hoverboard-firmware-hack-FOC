@@ -720,11 +720,11 @@
 
 #if defined ENCODER_X
 #define ENCODER_X_PPR              2048    // Pulses per revolution
-#define ALIGNMENT_X_POWER        6556      // [-] Voltage used for sensor alignment. [-16000, 16000]
+#define ALIGNMENT_X_POWER        3276      // [-] Voltage used for sensor alignment. [-16000, 16000]
 #endif
 #if defined ENCODER_Y
 #define ENCODER_Y_PPR            2048        // Pulses per revolution 
-#define ALIGNMENT_Y_POWER        6556        // [-] Voltage used for sensor alignment. [-16000, 16000]
+#define ALIGNMENT_Y_POWER        3276        // [-] Voltage used for sensor alignment. [-16000, 16000]
 #endif
 
   #define FLASH_WRITE_KEY        0x1011    // Flash memory writing key.
@@ -733,19 +733,19 @@
   #define CTRL_MOD_REQ           TRQ_MODE  
   
 #define TANK_STEERING                    // Each input controls each wheel
-#define HSPWM 
+#define HSPWM                             //Bypass PWM post proccessing for faster response
 //#define MOTOR_LEFT_ENA                  //  Enable LEFT motor.  Keeping left motor disabled. This is important for breaking resistor control if connected to left side driver in place of the motor
 #define MOTOR_RIGHT_ENA                 //  Enable RIGHT motor. Comment-out if this motor is not needed to be operational                        
 #define DIAG_ENA                 0               // [-] disable diag if using motor at stall
 #define INACTIVITY_TIMEOUT       100            // [s] Time of inactivity after which hoverboard shuts off
 // Limitation settings
-#define I_MOT_MAX                15              // [A] Maximum single motor current limit
+#define I_MOT_MAX                10              // [A] Maximum single motor current limit
 #define I_DC_MAX                 17              // [A] Maximum stage2 DC Link current limit (Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
 #define N_MOT_MAX                1900            // [rpm] Maximum motor speed limit
 
 
-#define DC_LINK_WATCHDOG_ENABLE 
-#define FIELD_WEAK_ENA           0 
+#define DC_LINK_WATCHDOG_ENABLE               //Disables the motor without warning incase of under or overvoltage, disable if using hoverboard as vehicle
+#define FIELD_WEAK_ENA           0         //0 for disabled
 //#define RC_PWM_RIGHT           0         // Use RC PWM as input on the RIGHT cable. (duty cycle mapped to 0 to -1000, 0, 1000) Number indicates priority for dual-input. Disable DEBUG_SERIAL_USART3!
 #define HW_PWM                   0         // Set to 0 or 1 depending on which motor you want to control also Use hw pwm pin PB5 on left side L_MTR_HALL_PHA  or could also be L_MTR_HALL_PHC 
 //#define CONTROL_ADC            1         // use ADC as input pn pins PA2 and PA3, cant be used with extbrk on PA2/PA3  
@@ -755,8 +755,8 @@
 //#define PPM_NUM_CHANNELS       1         // total number of PPM channels to receive, even if they are not used.
 //#define CONTROL_SERIAL_USART3  0         // left sensor board cable, disable if ADC or PPM is used! For Arduino control check the hoverSerial.ino
 //#define FEEDBACK_SERIAL_USART3           // left sensor board cable, disable if ADC or PPM is used!
-  #define PRI_INPUT1             0, -32767, 0, 32767,   0    //change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
-  #define PRI_INPUT2             2, -32767, 0, 32767,   0    //change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
+  #define PRI_INPUT1             0, -16000, 0, 16000,   0    //change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
+  #define PRI_INPUT2             2, -16000, 0, 16000,   0    //change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
   #define RATE                   32767     //leave to max rate 32767 if you want instant response  (may be needed if you need slower response)                  
   #define FILTER                 65535     //leave to max filter 65535 if you want instant response (may be needed if input is noisy)
   //#define INVERT_R_DIRECTION             //invert right motor direction
@@ -838,6 +838,7 @@
 #define I_DC_MAX                 17              // [A] Maximum stage2 DC Link current limit for Commutation and Sinusoidal types (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
 #define N_MOT_MAX                2000            // [rpm] Maximum motor speed limit
 
+#define DC_LINK_WATCHDOG_ENABLE               //Disables the motor without warning incase of under or overvoltage, disable if using hoverboard as vehicle
 #define FIELD_WEAK_ENA           0 
 //#define RC_PWM_RIGHT           0         // Use RC PWM as input on the RIGHT cable. (duty cycle mapped to 0 to -1000, 0, 1000) Number indicates priority for dual-input. Disable DEBUG_SERIAL_USART3!
 #define HW_PWM                   0         // Use hw pwm pin PB5 on left side L_MTR_HALL_PHA  (lowest noise input)
@@ -848,8 +849,8 @@
 //#define PPM_NUM_CHANNELS       1         // total number of PPM channels to receive, even if they are not used.
 //#define CONTROL_SERIAL_USART3  0         //  disable if right uart port is used for sw pwm input capture
 //#define FEEDBACK_SERIAL_USART3           //  disable if right uart port is used for sw pwm input capture
-  #define PRI_INPUT1             2, -32767, 0, 32767,   0   //left motor change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
-  #define PRI_INPUT2             2, -32767, 0, 32767,   0   //right motor change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
+  #define PRI_INPUT1             0, -16000, 0, 16000,   0   //left motor change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
+  #define PRI_INPUT2             2, -16000, 0, 16000,   0   //right motor change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
 
   #undef RATE
   #undef FILTER 

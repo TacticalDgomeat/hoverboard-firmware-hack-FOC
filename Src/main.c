@@ -672,7 +672,7 @@ int main(void) {
     } else
 #endif
 
-    if ( BAT_DEAD_ENABLE && (batVoltage < BAT_DEAD || batVoltage < HARD_18V_COUNTS) && speedAvgAbs < 20){
+    if ( BAT_DEAD_ENABLE && (batVoltage < BAT_DEAD || batVoltage < HARD_18V_COUNTS || DLVPA()) && speedAvgAbs < 20){
       #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
         printf("Powering off, battery voltage is too low\r\n");
       #endif
@@ -697,7 +697,11 @@ int main(void) {
     } else if (BEEPS_BACKWARD && (((cmdR < -50 || cmdL < -50) && speedAvg < 0) || MultipleTapBrake.b_multipleTap)) { // 1 beep fast (high pitch): Backward spinning motors
       beepCount(0, 5, 1);
       backwardDrive = 1;
-    } else {  // do not beep
+    }else if( DLVPA()){
+      beepCount(5, 10, 1);  // 1 beep very slow (high pitch): DLVPA active
+      enable = 0;
+    } 
+    else {  // do not beep
       beepCount(0, 0, 0);
       backwardDrive = 0;
     }

@@ -780,8 +780,9 @@ void Encoder_X_Align(void) {
  void handle_x_move_back_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t move_ms, uint32_t current_time) {
     // Stage A: Ramp down from high power to normal power
     if (elapsed_ticks < ramp_ms) {
-        uint32_t decel_ticks = (move_ms-ramp_ms) - elapsed_ticks;
-        encoder_x.align_inpTgt = ALIGNMENT_X_POWER + (ALIGNMENT_X_POWER * decel_ticks) / ramp_ms;
+        uint32_t decel_ticks = ramp_ms - elapsed_ticks;
+        int32_t ramp_target = ALIGNMENT_X_POWER + (ALIGNMENT_X_POWER * (int32_t)decel_ticks) / (int32_t)ramp_ms;
+        encoder_x.align_inpTgt = (int16_t)ramp_target;
     }
     // Stage B: Move emulated position back toward start
     else if (elapsed_ticks < move_ms) {
