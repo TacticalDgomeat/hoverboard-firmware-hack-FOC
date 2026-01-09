@@ -668,7 +668,7 @@
 */
 //#define GD32F103Rx              1   // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
 #define HOCP                        // Tie PA6/PB12 hardware over-current signals into TIM1/TIM8 break inputs
-//#define BEEPER_OFF                  //use led as beeper
+#define BEEPER_OFF                  //use led as beeper
 #define ENCODER_X                   //enable X encoder to right motor
 //#define ENCODER_Y                 //enable Y encoder to left motor
 #define INTBRK_L_EN                 //enable brake resistor control on PHASE A left side driver, do not disable if break reistor is connected 
