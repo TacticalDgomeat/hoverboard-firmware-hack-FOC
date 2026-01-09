@@ -187,11 +187,18 @@
 #define FIELD_WEAK_LO   750             // ( 500, 1000] Input target Low threshold for starting Field Weakening / Phase Advance. Do NOT set this higher than 1000.
 
 //Q axis control gains                      
-#define QP              0.3f                                //[-] P gain   
-#define QI              (float)(100.0f/(PWM_FREQ/3.0f))     //[-] I gain
+#define QP              0.3f                                  //[-] P gain
+#define QI              100.0f                                //[-] I gain
+     
 //D axis control gains
-#define DP              0.2f                               //[-] P gain   
-#define DI              (float)(50.0f/(PWM_FREQ/3.0f))     //[-] I gain            
+#define DP              0.2f                                   //[-] P gain   
+#define DI              50.0f                                 //[-] I gain
+
+
+///Dont touch
+#define QaI              (float)(QI/(PWM_FREQ/3.0f))      //Integrator scaling//                     
+#define DaI              (float)(DI/(PWM_FREQ/3.0f))      //Integrator scaling//  
+///End of Dont touch
 
 //#define BEEPER_OFF
 //#define ENCODER_X
@@ -704,11 +711,19 @@
 #define BAT_CELLS               6       // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
 
 //Q axis control gains                      
-#define QP              0.6f                          //[-] P gain   
-#define QI              (float)(200.0f/(PWM_FREQ/3.0f))     //[-] I gain
+#define QP              0.6f                                  //[-] P gain
+#define QI              200.0f                                //[-] I gain
+     
 //D axis control gains
-#define DP              0.3f                          //[-] P gain   
-#define DI              (float)(100.0f/(PWM_FREQ/3.0f))     //[-] I gain   
+#define DP              0.3f                                   //[-] P gain   
+#define DI              100.0f                                 //[-] I gain
+
+
+///Dont touch
+#define QaI              (float)(QI/(PWM_FREQ/3.0f))      //Integrator scaling//                     
+#define DaI              (float)(DI/(PWM_FREQ/3.0f))      //Integrator scaling//  
+///End of Dont touch 
+
 
 #if defined (INTBRK_L_EN) || defined (EXTBRK_EN)
 
@@ -817,12 +832,17 @@
 
 #define BAT_CELLS               6       // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
 
-//Q axis control gains                      
 #define QP              0.6f                          //[-] P gain   
-#define QI              (float)(200.0f/(PWM_FREQ/3.0f))     //[-] I gain
+#define QI              200.0f                                //[-] I gain
 //D axis control gains
-#define DP              0.3f                          //[-] P gain   
-#define DI              (float)(100.0f/(PWM_FREQ/3.0f))     //[-] I gain   
+#define DP              0.3f                                   //[-] P gain   
+#define DI              100.0f                                 //[-] I gain
+
+
+///Dont touch
+#define QaI              (float)(QI/(PWM_FREQ/3.0f))      //Integrator scaling//                     
+#define DaI              (float)(DI/(PWM_FREQ/3.0f))      //Integrator scaling//  
+///End of Dont touch
 
   #define FLASH_WRITE_KEY        0x1012    // Flash memory writing key.
   #define CTRL_TYP_SEL           FOC_CTRL 

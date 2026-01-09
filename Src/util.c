@@ -416,9 +416,9 @@ void BLDC_Init(void) {
   rtP_Left.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
   rtP_Left.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
   rtP_Left.n_polePairs          = N_POLE_PAIRS;                        // fixdt(1,16,4)
-  rtP_Left.cf_idKi              = DI;                             // Single
+  rtP_Left.cf_idKi              = DaI;                             // Single
   rtP_Left.cf_idKp              = DP;                              
-  rtP_Left.cf_iqKi              = QI;                              
+  rtP_Left.cf_iqKi              = QaI;                              
   rtP_Left.cf_iqKp              = QP;                              
 
   rtP_Right                     = rtP_Left;     // Copy the Left motor parameters to the Right motor parameters
