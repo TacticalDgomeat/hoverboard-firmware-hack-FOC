@@ -697,7 +697,7 @@ int main(void) {
     } else if (BEEPS_BACKWARD && (((cmdR < -50 || cmdL < -50) && speedAvg < 0) || MultipleTapBrake.b_multipleTap)) { // 1 beep fast (high pitch): Backward spinning motors
       beepCount(0, 5, 1);
       backwardDrive = 1;
-    }else if( DLVPA()){
+    } else if (DLVPA()) {
       beepCount(5, 10, 1);  // 1 beep very slow (high pitch): DLVPA active
       enable = 0;
     } 
