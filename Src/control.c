@@ -452,7 +452,7 @@ void PWM_Init(void) {
 
   gpio_pwm.Pin   = PWM_PIN_CH2;
   gpio_pwm.Mode  = GPIO_MODE_AF_INPUT;
-  gpio_pwm.Pull  = GPIO_PULLDOWN;
+  gpio_pwm.Pull  = GPIO_PULLUP; 
   gpio_pwm.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(PWM_PORT_CH2, &gpio_pwm);
 

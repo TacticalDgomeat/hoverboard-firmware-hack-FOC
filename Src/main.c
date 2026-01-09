@@ -246,6 +246,7 @@ int main(void) {
   HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_SET);
   Input_Lim_Init();   // Input Limitations Init
   Input_Init();       // Input Init
+  estop_init();       // E-stop init (noop if disabled)
 
   HAL_ADC_Start(&hadc1);
   HAL_ADC_Start(&hadc2);
@@ -298,27 +299,31 @@ int main(void) {
   while(1) {
 
        #ifdef ENCODER_X
-      if (!encoder_x.ini){
-        // Try to re-initialize the encoder if not yet initialized
-        Encoder_X_Init();
-      } else if (!encoder_x.ali) {
-        // Run non-blocking encoder alignment
-        if (encoder_x.align_state == 0) {
-          Encoder_X_Align_Start(); // Start alignment if not already running
+      if (!estop_active()) {
+        if (!encoder_x.ini){
+          // Try to re-initialize the encoder if not yet initialized
+          Encoder_X_Init();
+        } else if (!encoder_x.ali) {
+          // Run non-blocking encoder alignment
+          if (encoder_x.align_state == 0) {
+            Encoder_X_Align_Start(); // Start alignment if not already running
+          }
+          Encoder_X_Align(); // Process alignment state machine
         }
-        Encoder_X_Align(); // Process alignment state machine
       }
     #endif
     #ifdef ENCODER_Y
-      if (!encoder_y.ini){
-        // Try to re-initialize the encoder if not yet initialized
-        Encoder_Y_Init();
-      } else if (!encoder_y.ali) {
-        // Run non-blocking encoder alignment
-        if (encoder_y.align_state == 0) {
-          Encoder_Y_Align_Start(); // Start alignment if not already running
+      if (!estop_active()) {
+        if (!encoder_y.ini){
+          // Try to re-initialize the encoder if not yet initialized
+          Encoder_Y_Init();
+        } else if (!encoder_y.ali) {
+          // Run non-blocking encoder alignment
+          if (encoder_y.align_state == 0) {
+            Encoder_Y_Align_Start(); // Start alignment if not already running
+          }
+          Encoder_Y_Align(); // Process alignment state machine
         }
-        Encoder_Y_Align(); // Process alignment state machine
       }
     #endif
         
@@ -329,11 +334,12 @@ int main(void) {
     #endif
 
     if (buzzerTimer - buzzerTimer_prev > 16*DELAY_IN_MAIN_LOOP) {   // 1 ms = 16 ticks buzzerTimer
+    estop_update();                       // E-stop update
     readCommand();                        // Read Command: input1[inIdx].cmd, input2[inIdx].cmd
     calcAvgSpeed();                       // Calculate average measured speed: speedAvg, speedAvgAbs
     #ifndef VARIANT_TRANSPOTTER
       // ####### MOTOR ENABLING: Only if the initial input is very small (for SAFETY) #######
-      if (enable == 0 && !rtY_Left.z_errCode && !rtY_Right.z_errCode && 
+        if (enable == 0 && !rtY_Left.z_errCode && !rtY_Right.z_errCode && !estop_active() &&
           ABS(input1[inIdx].cmd) < 50 && ABS(input2[inIdx].cmd) < 50){
         beepShort(6);                     // make 2 beeps indicating the motor enable
         beepShort(4); HAL_Delay(100);
@@ -555,8 +561,7 @@ int main(void) {
 	      }
 	    } else {
               nunchuk_connected = 0;
-	    }
-          }
+	    }   
         }   
       #endif
 

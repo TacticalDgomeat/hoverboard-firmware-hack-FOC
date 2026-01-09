@@ -179,6 +179,19 @@ void poweroff(void);
 void poweroffPressCheck(void);
 uint8_t powerButtonPressed(void);
 
+// Emergency stop support
+void estop_init(void);
+void estop_update(void);
+#if defined(ESTOP_ENABLE)
+extern volatile uint8_t estop_flag;
+extern volatile uint8_t estop_latch_flag;
+static inline uint8_t estop_active(void) { return estop_flag; }
+static inline uint8_t estop_latched(void) { return estop_latch_flag; }
+#else
+static inline uint8_t estop_active(void) { return 0U; }
+static inline uint8_t estop_latched(void) { return 0U; }
+#endif
+
 #if defined(ANALOG_BUTTON)
 void AnalogButton_Init(void);
 #endif

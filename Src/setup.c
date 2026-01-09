@@ -395,6 +395,14 @@ void MX_GPIO_Init(void) {
   GPIO_InitStruct.Pin = BUTTON_PIN;
   HAL_GPIO_Init(BUTTON_PORT, &GPIO_InitStruct);
 
+#if defined(ESTOP_ENABLE)
+  GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull  = ESTOP_GPIO_PULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Pin   = ESTOP_PIN;
+  HAL_GPIO_Init(ESTOP_PORT, &GPIO_InitStruct);
+#endif
+
 
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 
@@ -442,8 +450,10 @@ void MX_GPIO_Init(void) {
 
   //Analog in
   #if !defined(SUPPORT_BUTTONS_LEFT)
+  #if !defined(ESTOP_ENABLE)
   GPIO_InitStruct.Pin = GPIO_PIN_3;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  #endif
   GPIO_InitStruct.Pin = GPIO_PIN_2;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   #endif

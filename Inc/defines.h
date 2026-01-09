@@ -230,6 +230,23 @@
 #define EXT_PWM_BRK            TIM5->CCR4
 #endif
 
+#if defined(ESTOP_ENABLE)
+  #if defined(EXTBRK_USE_CH4)
+    #error "EXTBRK_USE_CH4 conflicts with ESTOP_ENABLE (both use PA3)"
+  #endif
+  #define ESTOP_PIN              GPIO_PIN_3
+  #define ESTOP_PORT             GPIOA
+  #if defined(ESTOP_BUTTON_NO)
+    #define ESTOP_ACTIVE_STATE   GPIO_PIN_RESET
+    #define ESTOP_IDLE_STATE     GPIO_PIN_SET
+    #define ESTOP_GPIO_PULL      GPIO_PULLUP
+  #else /* ESTOP_BUTTON_NC */
+    #define ESTOP_ACTIVE_STATE   GPIO_PIN_SET
+    #define ESTOP_IDLE_STATE     GPIO_PIN_RESET
+    #define ESTOP_GPIO_PULL      GPIO_PULLDOWN
+  #endif
+#endif
+
 #if defined(HOCP)
 #define TIM1_BKIN_PIN       GPIO_PIN_6
 #define TIM1_BKIN_PORT      GPIOA

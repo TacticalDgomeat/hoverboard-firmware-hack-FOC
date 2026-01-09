@@ -93,6 +93,67 @@ void AnalogButton_Init(void) {
 }
 #endif
 
+#if defined(ESTOP_ENABLE)
+volatile uint8_t estop_flag        = 0U;
+volatile uint8_t estop_latch_flag  = 0U;
+static uint8_t          estop_state       = 0U;
+static uint8_t          estop_sample_prev = 0U;
+static uint32_t         estop_change_tick = 0U;
+
+void estop_init(void) {
+  estop_flag        = 0U;
+  estop_latch_flag  = 0U;
+  estop_change_tick = HAL_GetTick();
+  estop_sample_prev = (HAL_GPIO_ReadPin(ESTOP_PORT, ESTOP_PIN) == ESTOP_ACTIVE_STATE);
+  estop_state       = estop_sample_prev;
+}
+
+void estop_update(void) {
+  const uint32_t now   = HAL_GetTick();
+  const uint8_t sample = (HAL_GPIO_ReadPin(ESTOP_PORT, ESTOP_PIN) == ESTOP_ACTIVE_STATE);
+
+  if (sample != estop_sample_prev) {
+    estop_sample_prev = sample;
+    estop_change_tick = now;
+  }
+
+  if ((now - estop_change_tick) >= ESTOP_DEBOUNCE_MS && estop_state != estop_sample_prev) {
+    estop_state = estop_sample_prev;
+    if (estop_state) {
+#if defined(ESTOP_REQUIRE_HOLD)
+      estop_flag = 1U;
+#else
+      if (estop_latch_flag) {
+        estop_latch_flag = 0U;
+        estop_flag       = 0U;
+      } else {
+        estop_flag = 1U;
+        #if defined(ESTOP_BUTTON_NO)
+        estop_latch_flag = 1U;
+        #endif
+      }
+#endif
+    } else {
+#if defined(ESTOP_REQUIRE_HOLD)
+      estop_flag = 0U;
+#else
+      #if defined(ESTOP_BUTTON_NO)
+        if (!estop_latch_flag) {
+          estop_flag = 0U;
+        }
+      #else
+        estop_flag = 0U;
+      #endif
+#endif
+    }
+  }
+}
+
+#else
+void estop_init(void) {}
+void estop_update(void) {}
+#endif
+
 #if defined(DC_LINK_WATCHDOG_ENABLE)
 extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
@@ -614,7 +675,7 @@ void Encoder_X_Init(void) {
     // Channel A
     GPIO_InitStruct.Pin = ENCODER_X_CHA_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_INPUT;
-    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
     HAL_GPIO_Init(ENCODER_X_CHA_PORT, &GPIO_InitStruct);
 
     // Channel B
@@ -1031,8 +1092,9 @@ void Encoder_Y_Align(void) {
  void handle_y_move_back_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t move_ms, uint32_t current_time) {
     // Stage A: Ramp down from high power to normal power
     if (elapsed_ticks < ramp_ms) {
-        uint32_t decel_ticks = (move_ms-ramp_ms) - elapsed_ticks;
-        encoder_y.align_inpTgt = ALIGNMENT_Y_POWER + (ALIGNMENT_Y_POWER * decel_ticks) / ramp_ms;
+        uint32_t decel_ticks = ramp_ms - elapsed_ticks;
+        int32_t ramp_target = ALIGNMENT_Y_POWER + (ALIGNMENT_Y_POWER * (int32_t)decel_ticks) / (int32_t)ramp_ms;
+        encoder_y.align_inpTgt = (int16_t)ramp_target;
     }
     // Stage B: Move emulated position back toward start
     else if (elapsed_ticks < move_ms) {
@@ -1578,7 +1640,7 @@ void readInputRaw(void) {
   }
   #endif
 
-    #if defined(CONTROL_NUNCHUK) || defined(SUPPORT_NUNCHUK)
+    #if defined(CONTROL_NUNCHUK) || defined(SUPPORT_NUNCHUK)                      ///issue with support nunchuk 
     if (Nunchuk_Read() == NUNCHUK_CONNECTED) {
       if (inIdx == CONTROL_NUNCHUK) {
         input1[idx].raw = (nunchuk_data[0] - 127) * 8; // X axis 0-255
@@ -1685,12 +1747,12 @@ void readInputRaw(void) {
     #endif
     #ifdef VARIANT_TRANSPOTTER
     #ifdef GAMETRAK_CONNECTION_NORMAL
-  input1[idx].cmd = adc_buffer.adc12.value.l_rx2;
-  input2[idx].cmd = adc_buffer.adc12.value.l_tx2;
+  input1[idx].cmd = adc_buffer.adc3.value.l_rx2;
+  input2[idx].cmd = adc_buffer.adc3.value.l_tx2;
     #endif
     #ifdef GAMETRAK_CONNECTION_ALTERNATE
-  input1[idx].cmd = adc_buffer.adc12.value.l_tx2;
-  input2[idx].cmd = adc_buffer.adc12.value.l_rx2;
+  input1[idx].cmd = adc_buffer.adc3.value.l_tx2;
+  input2[idx].cmd = adc_buffer.adc3.value.l_rx2;
     #endif
     #endif
 }

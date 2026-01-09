@@ -625,7 +625,7 @@
   #define FLASH_WRITE_KEY     0x1009    // Flash memory writing key. Change this key to ignore the input calibrations from the flash memory and use the ones in config.h
   #define CONTROL_GAMETRAK
   #define SUPPORT_LCD
-  // #define SUPPORT_NUNCHUK
+  //#define SUPPORT_NUNCHUK             //ISSUE SUPPORT_NUNCHUK  
   #define GAMETRAK_CONNECTION_NORMAL    // for normal wiring according to the wiki instructions
   // #define GAMETRAK_CONNECTION_ALTERNATE // use this define instead if you messed up the gametrak ADC wiring (steering is speed, and length of the wire is steering)
   #define ROT_P               1.2       // P coefficient for the direction controller. Positive / Negative values to invert gametrak steering direction.
@@ -695,7 +695,8 @@
 #undef DP
 #undef DI
 ////////////////////////////////////////
-
+#define ESTOP_REQUIRE_HOLD           // Require the button to stay pressed for the estop to remain active (default when no button type defined).
+#define ESTOP_ENABLE                //ESTOP functionality enabled
 #define GD32F103Rx              1   // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
 #define HOCP                        // Tie PA6/PB12 hardware over-current signals into TIM1/TIM8 break inputs
 #define BEEPER_OFF                  //use led as beeper
@@ -708,7 +709,7 @@
 //#define EXTBRK_USE_CH4            // PA3
 #endif
 
-#define BAT_CELLS               6      // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
+#define BAT_CELLS               5      // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
 
 //Q axis control gains                      
 #define QP              0.6f                                  //[-] P gain
@@ -754,7 +755,7 @@
 #define DIAG_ENA                 0               // [-] disable diag if using motor at stall
 #define INACTIVITY_TIMEOUT       100            // [s] Time of inactivity after which hoverboard shuts off
 // Limitation settings
-#define I_MOT_MAX                10              // [A] Maximum single motor current limit
+#define I_MOT_MAX                9              // [A] Maximum single motor current limit
 #define I_DC_MAX                 17              // [A] Maximum stage2 DC Link current limit (Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
 #define N_MOT_MAX                1900            // [rpm] Maximum motor speed limit
 
@@ -960,6 +961,22 @@
   #define ANALOG_BUTTON_RELEASE_MAX    POWER_BUTTON_ADC_COUNTS_FROM_MV((POWER_BUTTON_THRESHOLD_MV) - (POWER_BUTTON_RELEASE_MARGIN_MV))
 #endif
 
+// ############################### EMERGENCY STOP INPUT ###############################
+// #define ESTOP_ENABLE                 // Enable discrete e-stop input on PA3 (shared with EXTBRK_USE_CH4). Comment out to disable.
+// #define ESTOP_BUTTON_NO              // Normally Open (active low). Press once to latch until the next press.
+// #define ESTOP_BUTTON_NC              // Normally Closed (active high). Do not define together with ESTOP_BUTTON_NO.
+// #define ESTOP_REQUIRE_HOLD           // Require the button to stay pressed for the estop to remain active (default when no button type defined).
+#ifdef ESTOP_ENABLE
+  #if defined(ESTOP_BUTTON_NO) && defined(ESTOP_BUTTON_NC)
+    #error "Define only one of ESTOP_BUTTON_NO or ESTOP_BUTTON_NC"
+  #endif
+  #if !defined(ESTOP_BUTTON_NO) && !defined(ESTOP_BUTTON_NC)
+    #define ESTOP_BUTTON_NO
+  #endif
+  #ifndef ESTOP_DEBOUNCE_MS
+    #define ESTOP_DEBOUNCE_MS   30U     // Debounce window (ms) for the estop input
+  #endif
+#endif
 // ########################### END OF APPLY DEFAULT SETTING ############################
 
 
@@ -1046,6 +1063,10 @@
 #endif
 #if defined(INTBRK_L_EN) && defined(EXTBRK_EN)
   #error INTBRK_L_EN and EXTBRK_EN cannot be used at the same time. Please choose one braking method.
+#endif
+
+#if defined(ESTOP_ENABLE) && defined(EXTBRK_USE_CH4)
+  #error ESTOP_ENABLE and EXTBRK_USE_CH4 conflict on PA3. Choose a different brake channel or disable e-stop.
 #endif
 
 
