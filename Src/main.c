@@ -111,7 +111,7 @@ int16_t board_temp_adcFilt = 0;
      volatile boolean_T rc_pwm_ready_ch2 = 0;
 #endif
 #ifdef HW_PWM
-  //volatile boolean_T hw_pwm_ready = 0;
+  volatile boolean_T hw_pwm_ready = 0;
 #endif
 #if defined(SW_PWM_LEFT) || defined(SW_PWM_RIGHT)
   volatile boolean_T sw_pwm_ready_ch1 = 0;
@@ -322,6 +322,11 @@ int main(void) {
       }
     #endif
         
+    #if defined(HW_PWM)
+    if(hw_pwm_ready) {
+        calc_hw_pwm();
+    }
+    #endif
 
     if (buzzerTimer - buzzerTimer_prev > 16*DELAY_IN_MAIN_LOOP) {   // 1 ms = 16 ticks buzzerTimer
     readCommand();                        // Read Command: input1[inIdx].cmd, input2[inIdx].cmd
@@ -400,13 +405,13 @@ int main(void) {
          calc_rc_pwm_ch2();
       }
       #endif
-
+/* 
       #if defined(HW_PWM)
       //if(hw_pwm_ready) {
         calc_hw_pwm();
       //}
       #endif
-
+*/
      #if defined(SW_PWM_LEFT) || defined(SW_PWM_RIGHT)
      
         if(sw_pwm_ready_ch1) {
@@ -667,7 +672,7 @@ int main(void) {
     } else
 #endif
 
-    if ( BAT_DEAD_ENABLE && (batVoltage < BAT_DEAD || batVoltage < HARD_18V_COUNTS) && speedAvgAbs < 20){
+    if ( BAT_DEAD_ENABLE && (batVoltage < BAT_DEAD || batVoltage < HARD_18V_COUNTS || DLVPA()) && speedAvgAbs < 20){
       #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
         printf("Powering off, battery voltage is too low\r\n");
       #endif
@@ -692,7 +697,11 @@ int main(void) {
     } else if (BEEPS_BACKWARD && (((cmdR < -50 || cmdL < -50) && speedAvg < 0) || MultipleTapBrake.b_multipleTap)) { // 1 beep fast (high pitch): Backward spinning motors
       beepCount(0, 5, 1);
       backwardDrive = 1;
-    } else {  // do not beep
+    } else if (DLVPA()) {
+      beepCount(5, 10, 1);  // 1 beep very slow (high pitch): DLVPA active
+      enable = 0;
+    } 
+    else {  // do not beep
       beepCount(0, 0, 0);
       backwardDrive = 0;
     }

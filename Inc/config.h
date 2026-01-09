@@ -186,6 +186,20 @@
 #define FIELD_WEAK_HI   1000            // (1000, 1500] Input target High threshold for reaching maximum Field Weakening / Phase Advance. Do NOT set this higher than 1500.
 #define FIELD_WEAK_LO   750             // ( 500, 1000] Input target Low threshold for starting Field Weakening / Phase Advance. Do NOT set this higher than 1000.
 
+//Q axis control gains                      
+#define QP              0.3f                                  //[-] P gain
+#define QI              100.0f                                //[-] I gain
+     
+//D axis control gains
+#define DP              0.2f                                   //[-] P gain   
+#define DI              50.0f                                 //[-] I gain
+
+
+///Dont touch
+#define QaI              (float)(QI/(PWM_FREQ/3.0f))      //Integrator scaling//                     
+#define DaI              (float)(DI/(PWM_FREQ/3.0f))      //Integrator scaling//  
+///End of Dont touch
+
 //#define BEEPER_OFF
 //#define ENCODER_X
 //#define ENCODER_Y                         // 
@@ -666,7 +680,23 @@
 /* ###### CONTROL VIA ENCODER ######
  * This variant is for using encoder for motor control.
 */
-//#define GD32F103Rx              1   // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
+#undef MOTOR_LEFT_ENA                    // Undefines any default defines
+#undef  CTRL_MOD_REQ
+#undef  CTRL_TYP_SEL
+#undef  DIAG_ENA
+#undef BAT_CELLS
+#undef  INACTIVITY_TIMEOUT
+#undef N_MOT_MAX
+#undef I_MOT_MAX
+#undef I_DC_MAX
+#undef FIELD_WEAK_ENA
+#undef QP
+#undef QI
+#undef DP
+#undef DI
+////////////////////////////////////////
+
+#define GD32F103Rx              1   // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
 #define HOCP                        // Tie PA6/PB12 hardware over-current signals into TIM1/TIM8 break inputs
 #define BEEPER_OFF                  //use led as beeper
 #define ENCODER_X                   //enable X encoder to right motor
@@ -678,6 +708,23 @@
 //#define EXTBRK_USE_CH4            // PA3
 #endif
 
+#define BAT_CELLS               6       // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
+
+//Q axis control gains                      
+#define QP              0.6f                                  //[-] P gain
+#define QI              200.0f                                //[-] I gain
+     
+//D axis control gains
+#define DP              0.3f                                   //[-] P gain   
+#define DI              100.0f                                 //[-] I gain
+
+
+///Dont touch
+#define QaI              (float)(QI/(PWM_FREQ/3.0f))      //Integrator scaling//                     
+#define DaI              (float)(DI/(PWM_FREQ/3.0f))      //Integrator scaling//  
+///End of Dont touch 
+
+
 #if defined (INTBRK_L_EN) || defined (EXTBRK_EN)
 
   #define BRAKE_RESISTANCE 300                // [Ohm]3ohm X100 Value of the braking resistor. Set it to your own brake resistor resistance, increase the resistance here a bit for example I use 2.2ohm but I set to 3ohm here to be safe. 
@@ -687,44 +734,38 @@
 #endif  
 
 #if defined ENCODER_X
-#define ENCODER_X_PPR              2048     // Pulses per revolution
-#define ALIGNMENT_X_POWER        6553      // [-] Voltage used for sensor alignment. [-16000, 16000]
+#define ENCODER_X_PPR              2048    // Pulses per revolution
+#define ALIGNMENT_X_POWER        3276      // [-] Voltage used for sensor alignment. [-16000, 16000]
 #endif
 #if defined ENCODER_Y
 #define ENCODER_Y_PPR            2048        // Pulses per revolution 
-#define ALIGNMENT_Y_POWER        6553        // [-] Voltage used for sensor alignment. [-16000, 16000]
+#define ALIGNMENT_Y_POWER        3276        // [-] Voltage used for sensor alignment. [-16000, 16000]
 #endif
 
   #define FLASH_WRITE_KEY        0x1011    // Flash memory writing key.
-  #undef  CTRL_MOD_REQ
-  #undef  CTRL_TYP_SEL
+  
   #define CTRL_TYP_SEL           FOC_CTRL   
   #define CTRL_MOD_REQ           TRQ_MODE  
   
-#define TANK_STEERING                    //each input controls each wheel
-#undef MOTOR_LEFT_ENA
-//#define MOTOR_LEFT_ENA                  // [-] Enable LEFT motor.  Comment-out if this motor is not needed to be operational
-#define MOTOR_RIGHT_ENA                 // [-] Enable RIGHT motor. Comment-out if this motor is not needed to be operational
-#undef  DIAG_ENA 
+#define TANK_STEERING                    // Each input controls each wheel
+#define HSPWM                             //Bypass PWM post proccessing for faster response
+//#define MOTOR_LEFT_ENA                  //  Enable LEFT motor.  Keeping left motor disabled. This is important for breaking resistor control if connected to left side driver in place of the motor
+#define MOTOR_RIGHT_ENA                 //  Enable RIGHT motor. Comment-out if this motor is not needed to be operational                        
 #define DIAG_ENA                 0               // [-] disable diag if using motor at stall
-#undef  INACTIVITY_TIMEOUT
-#define INACTIVITY_TIMEOUT       100
+#define INACTIVITY_TIMEOUT       100            // [s] Time of inactivity after which hoverboard shuts off
 // Limitation settings
-#undef N_MOT_MAX 
-#undef I_MOT_MAX 
-#define I_MOT_MAX                15              // [A] Maximum single motor current limit
+#define I_MOT_MAX                10              // [A] Maximum single motor current limit
 #define I_DC_MAX                 17              // [A] Maximum stage2 DC Link current limit (Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
-#undef N_MOT_MAX
-#define N_MOT_MAX                2000            // [rpm] Maximum motor speed limit
+#define N_MOT_MAX                1900            // [rpm] Maximum motor speed limit
 
-#define DC_LINK_WATCHDOG_ENABLE 
-#undef FIELD_WEAK_ENA
-#define FIELD_WEAK_ENA           0 
+
+#define DC_LINK_WATCHDOG_ENABLE               //Disables the motor without warning incase of under or overvoltage, disable if using hoverboard as vehicle
+#define FIELD_WEAK_ENA           0         //0 for disabled
 //#define RC_PWM_RIGHT           0         // Use RC PWM as input on the RIGHT cable. (duty cycle mapped to 0 to -1000, 0, 1000) Number indicates priority for dual-input. Disable DEBUG_SERIAL_USART3!
-#define HW_PWM                   0         // Use hw pwm pin PB5 on left side L_MTR_HALL_PHA  or could also be L_MTR_HALL_PHC 
+#define HW_PWM                   0         // Set to 0 or 1 depending on which motor you want to control also Use hw pwm pin PB5 on left side L_MTR_HALL_PHA  or could also be L_MTR_HALL_PHC 
 //#define CONTROL_ADC            1         // use ADC as input pn pins PA2 and PA3, cant be used with extbrk on PA2/PA3  
 //#define SW_PWM_RIGHT           0         // Use PWM input capture on PB10 and PB11 (duty cycle mapped to 0 to -16000, 0, 16000)
-//#define SW_PWM_LEFT            0         // Use PWM input capture on PA2 and PA3 (duty cycle mapped to 0 to -16000, 0, 16000)   (cant be use with extbrk on PA2/PA3)
+//#define SW_PWM_LEFT            1         // Use PWM input capture on PA2 and PA3 (duty cycle mapped to 0 to -16000, 0, 16000)   (cant be use with extbrk on PA2/PA3)
 //#define CONTROL_PPM_LEFT       0         // use PPM-Sum as input on the LEFT cable. Number indicates priority for dual-input. Disable DEBUG_SERIAL_USART2!
 //#define PPM_NUM_CHANNELS       1         // total number of PPM channels to receive, even if they are not used.
 //#define CONTROL_SERIAL_USART3  0         // left sensor board cable, disable if ADC or PPM is used! For Arduino control check the hoverSerial.ino
@@ -743,6 +784,23 @@
 /* ###### CONTROL VIA ENCODER ######
  * This variant is for using encoders for motor control.
 */
+// undefine macros that will be reconfigured for the two axis variant
+#undef MOTOR_LEFT_ENA
+#undef CTRL_MOD_REQ
+#undef CTRL_TYP_SEL
+#undef DIAG_ENA
+#undef BAT_CELLS
+#undef INACTIVITY_TIMEOUT
+#undef N_MOT_MAX
+#undef I_MOT_MAX
+#undef I_DC_MAX
+#undef FIELD_WEAK_ENA
+#undef QP
+#undef QI
+#undef DP
+#undef DI
+////////////////////////////////////////
+
 #define GD32F103Rx              1   // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
 #define HOCP                        // Tie PA6/PB12 hardware over-current signals into TIM1/TIM8 break inputs
 #define BEEPER_OFF                  //use led as beeper
@@ -765,33 +823,42 @@
 
 #if defined ENCODER_X
 #define ENCODER_X_PPR            2048       // Pulses per revolution
-#define ALIGNMENT_X_POWER        6553       // [-] Voltage used for sensor alignment. [-16000, 16000]
+#define ALIGNMENT_X_POWER        3276       // [-] Voltage used for sensor alignment. [-16000, 16000]
 #endif
 #if defined ENCODER_Y
 #define ENCODER_Y_PPR            2048        // Pulses per revolution 
-#define ALIGNMENT_Y_POWER        6553        // [-] Voltage used for sensor alignment. [-16000, 16000]
+#define ALIGNMENT_Y_POWER        3276        // [-] Voltage used for sensor alignment. [-16000, 16000]
 #endif
 
+#define BAT_CELLS               6       // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
+
+#define QP              0.6f                          //[-] P gain   
+#define QI              200.0f                                //[-] I gain
+//D axis control gains
+#define DP              0.3f                                   //[-] P gain   
+#define DI              100.0f                                 //[-] I gain
+
+
+///Dont touch
+#define QaI              (float)(QI/(PWM_FREQ/3.0f))      //Integrator scaling//                     
+#define DaI              (float)(DI/(PWM_FREQ/3.0f))      //Integrator scaling//  
+///End of Dont touch
+
   #define FLASH_WRITE_KEY        0x1012    // Flash memory writing key.
-  #undef  CTRL_MOD_REQ
-  #undef  CTRL_TYP_SEL
   #define CTRL_TYP_SEL           FOC_CTRL 
   #define CTRL_MOD_REQ           TRQ_MODE  
   
   #define TANK_STEERING  
 #define MOTOR_LEFT_ENA                  // [-] Enable LEFT motor.  Comment-out if this motor is not needed to be operational
 #define MOTOR_RIGHT_ENA                 // [-] Enable RIGHT motor. Comment-out if this motor is not needed to be operational
-#undef  DIAG_ENA 
 #define DIAG_ENA                 0               // [-] Motor Diagnostics enable flag: 0 = Disabled, 1 = Enabled (default)
-#undef  INACTIVITY_TIMEOUT
 #define INACTIVITY_TIMEOUT       100
 // Limitation settings
-#undef I_MOT_MAX 
-#undef N_MOT_MAX
 #define I_MOT_MAX                15              // [A] Maximum single motor current limit
 #define I_DC_MAX                 17              // [A] Maximum stage2 DC Link current limit for Commutation and Sinusoidal types (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
 #define N_MOT_MAX                2000            // [rpm] Maximum motor speed limit
 
+#define DC_LINK_WATCHDOG_ENABLE               //Disables the motor without warning incase of under or overvoltage, disable if using hoverboard as vehicle
 #define FIELD_WEAK_ENA           0 
 //#define RC_PWM_RIGHT           0         // Use RC PWM as input on the RIGHT cable. (duty cycle mapped to 0 to -1000, 0, 1000) Number indicates priority for dual-input. Disable DEBUG_SERIAL_USART3!
 #define HW_PWM                   0         // Use hw pwm pin PB5 on left side L_MTR_HALL_PHA  (lowest noise input)
@@ -802,8 +869,8 @@
 //#define PPM_NUM_CHANNELS       1         // total number of PPM channels to receive, even if they are not used.
 //#define CONTROL_SERIAL_USART3  0         //  disable if right uart port is used for sw pwm input capture
 //#define FEEDBACK_SERIAL_USART3           //  disable if right uart port is used for sw pwm input capture
-  #define PRI_INPUT1             2, -1000, 0, 1000,   0   //left motor change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
-  #define PRI_INPUT2             2, -1000, 0, 1000,   0   //right motor change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
+  #define PRI_INPUT1             0, -16000, 0, 16000,   0   //left motor change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
+  #define PRI_INPUT2             2, -16000, 0, 16000,   0   //right motor change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
 
   #undef RATE
   #undef FILTER 

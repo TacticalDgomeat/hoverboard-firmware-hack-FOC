@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'BLDC_controller'.
  *
- * Model version                  : 16.9
+ * Model version                  : 16.18
  * Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
- * C/C++ source code generated on : Sat Oct 25 19:14:09 2025
+ * C/C++ source code generated on : Wed Jan  7 21:34:53 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -119,11 +119,6 @@ extern void PI_clamp_fixdt_d_Reset(DW_PI_clamp_fixdt_e *localDW);
 extern int16_T PI_clamp_fixdt_j(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I,
   int16_T rtu_init, int16_T rtu_satMax, int16_T rtu_satMin, int32_T
   rtu_ext_limProt, DW_PI_clamp_fixdt_e *localDW);
-extern void PI_clamp_fixdt_d_Init(DW_PI_clamp_fixdt_e5 *localDW);
-extern void PI_clamp_fixdt_o_Reset(DW_PI_clamp_fixdt_e5 *localDW);
-extern int16_T PI_clamp_fixdt_e(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I,
-  int16_T rtu_init, int16_T rtu_satMax, int16_T rtu_satMin, int32_T
-  rtu_ext_limProt, DW_PI_clamp_fixdt_e5 *localDW);
 
 /* Forward declaration for local functions */
 void enter_internal_ACTIVE(const boolean_T *LogicalOperator1, const boolean_T
@@ -504,36 +499,36 @@ void Debounce_Filter(boolean_T rtu_u, uint16_T rtu_tAcv, uint16_T rtu_tDeacv,
 
 /*
  * System initialize for atomic system:
- *    '<S83>/I_backCalc_fixdt'
- *    '<S83>/I_backCalc_fixdt1'
- *    '<S82>/I_backCalc_fixdt'
+ *    '<S136>/I_backCalc_fixdt'
+ *    '<S136>/I_backCalc_fixdt1'
+ *    '<S135>/I_backCalc_fixdt'
  */
 void I_backCalc_fixdt_Init(int32_T rtp_yInit, DW_I_backCalc_fixdt *localDW)
 {
-  /* InitializeConditions for UnitDelay: '<S90>/UnitDelay' */
+  /* InitializeConditions for UnitDelay: '<S143>/UnitDelay' */
   localDW->UnitDelay_DSTATE_a = rtp_yInit;
 }
 
 /*
  * System reset for atomic system:
- *    '<S83>/I_backCalc_fixdt'
- *    '<S83>/I_backCalc_fixdt1'
- *    '<S82>/I_backCalc_fixdt'
+ *    '<S136>/I_backCalc_fixdt'
+ *    '<S136>/I_backCalc_fixdt1'
+ *    '<S135>/I_backCalc_fixdt'
  */
 void I_backCalc_fixdt_Reset(int32_T rtp_yInit, DW_I_backCalc_fixdt *localDW)
 {
-  /* InitializeConditions for UnitDelay: '<S88>/UnitDelay' */
+  /* InitializeConditions for UnitDelay: '<S141>/UnitDelay' */
   localDW->UnitDelay_DSTATE = 0;
 
-  /* InitializeConditions for UnitDelay: '<S90>/UnitDelay' */
+  /* InitializeConditions for UnitDelay: '<S143>/UnitDelay' */
   localDW->UnitDelay_DSTATE_a = rtp_yInit;
 }
 
 /*
  * Output and update for atomic system:
- *    '<S83>/I_backCalc_fixdt'
- *    '<S83>/I_backCalc_fixdt1'
- *    '<S82>/I_backCalc_fixdt'
+ *    '<S136>/I_backCalc_fixdt'
+ *    '<S136>/I_backCalc_fixdt1'
+ *    '<S135>/I_backCalc_fixdt'
  */
 void I_backCalc_fixdt(int16_T rtu_err, uint16_T rtu_I, uint16_T rtu_Kb, int16_T
                       rtu_satMax, int16_T rtu_satMin, int16_T *rty_out,
@@ -542,9 +537,9 @@ void I_backCalc_fixdt(int16_T rtu_err, uint16_T rtu_I, uint16_T rtu_Kb, int16_T
   int32_T rtb_Sum1_bk;
   int16_T rtb_DataTypeConversion1_l;
 
-  /* Sum: '<S88>/Sum2' incorporates:
-   *  Product: '<S88>/Divide2'
-   *  UnitDelay: '<S88>/UnitDelay'
+  /* Sum: '<S141>/Sum2' incorporates:
+   *  Product: '<S141>/Divide2'
+   *  UnitDelay: '<S141>/UnitDelay'
    */
   rtb_Sum1_bk = (rtu_err * rtu_I) >> 4;
   if ((rtb_Sum1_bk < 0) && (localDW->UnitDelay_DSTATE < MIN_int32_T
@@ -557,44 +552,44 @@ void I_backCalc_fixdt(int16_T rtu_err, uint16_T rtu_I, uint16_T rtu_Kb, int16_T
     rtb_Sum1_bk += localDW->UnitDelay_DSTATE;
   }
 
-  /* Sum: '<S90>/Sum1' incorporates:
-   *  Sum: '<S88>/Sum2'
-   *  UnitDelay: '<S90>/UnitDelay'
+  /* Sum: '<S143>/Sum1' incorporates:
+   *  Sum: '<S141>/Sum2'
+   *  UnitDelay: '<S143>/UnitDelay'
    */
   rtb_Sum1_bk += localDW->UnitDelay_DSTATE_a;
 
-  /* DataTypeConversion: '<S90>/Data Type Conversion1' incorporates:
-   *  Sum: '<S90>/Sum1'
+  /* DataTypeConversion: '<S143>/Data Type Conversion1' incorporates:
+   *  Sum: '<S143>/Sum1'
    */
   rtb_DataTypeConversion1_l = (int16_T)(rtb_Sum1_bk >> 12);
 
-  /* Switch: '<S91>/Switch2' incorporates:
-   *  DataTypeConversion: '<S90>/Data Type Conversion1'
-   *  RelationalOperator: '<S91>/LowerRelop1'
-   *  RelationalOperator: '<S91>/UpperRelop'
-   *  Switch: '<S91>/Switch'
+  /* Switch: '<S144>/Switch2' incorporates:
+   *  DataTypeConversion: '<S143>/Data Type Conversion1'
+   *  RelationalOperator: '<S144>/LowerRelop1'
+   *  RelationalOperator: '<S144>/UpperRelop'
+   *  Switch: '<S144>/Switch'
    */
   if (rtb_DataTypeConversion1_l > rtu_satMax) {
     *rty_out = rtu_satMax;
   } else if (rtb_DataTypeConversion1_l < rtu_satMin) {
-    /* Switch: '<S91>/Switch' */
+    /* Switch: '<S144>/Switch' */
     *rty_out = rtu_satMin;
   } else {
     *rty_out = rtb_DataTypeConversion1_l;
   }
 
-  /* End of Switch: '<S91>/Switch2' */
+  /* End of Switch: '<S144>/Switch2' */
 
-  /* Update for UnitDelay: '<S88>/UnitDelay' incorporates:
-   *  DataTypeConversion: '<S90>/Data Type Conversion1'
-   *  Product: '<S88>/Divide1'
-   *  Sum: '<S88>/Sum3'
+  /* Update for UnitDelay: '<S141>/UnitDelay' incorporates:
+   *  DataTypeConversion: '<S143>/Data Type Conversion1'
+   *  Product: '<S141>/Divide1'
+   *  Sum: '<S141>/Sum3'
    */
   localDW->UnitDelay_DSTATE = (int16_T)(*rty_out - rtb_DataTypeConversion1_l) *
     rtu_Kb;
 
-  /* Update for UnitDelay: '<S90>/UnitDelay' incorporates:
-   *  Sum: '<S90>/Sum1'
+  /* Update for UnitDelay: '<S143>/UnitDelay' incorporates:
+   *  Sum: '<S143>/Sum1'
    */
   localDW->UnitDelay_DSTATE_a = rtb_Sum1_bk;
 }
@@ -602,17 +597,17 @@ void I_backCalc_fixdt(int16_T rtu_err, uint16_T rtu_I, uint16_T rtu_Kb, int16_T
 /* System initialize for atomic system: '<S63>/PI_clamp_fixdt' */
 void PI_clamp_fixdt_Init(DW_PI_clamp_fixdt *localDW)
 {
-  /* InitializeConditions for Delay: '<S77>/Resettable Delay' */
+  /* InitializeConditions for Delay: '<S130>/Resettable Delay' */
   localDW->icLoad = true;
 }
 
 /* System reset for atomic system: '<S63>/PI_clamp_fixdt' */
 void PI_clamp_fixdt_Reset(DW_PI_clamp_fixdt *localDW)
 {
-  /* InitializeConditions for UnitDelay: '<S74>/UnitDelay1' */
+  /* InitializeConditions for UnitDelay: '<S127>/UnitDelay1' */
   localDW->UnitDelay1_DSTATE = false;
 
-  /* InitializeConditions for Delay: '<S77>/Resettable Delay' */
+  /* InitializeConditions for Delay: '<S130>/Resettable Delay' */
   localDW->icLoad = true;
 }
 
@@ -629,8 +624,8 @@ int16_T PI_clamp_fixdt(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I, int32_T
   boolean_T rtb_LowerRelop1_e;
   boolean_T rtb_UpperRelop_nh;
 
-  /* Sum: '<S74>/Sum2' incorporates:
-   *  Product: '<S74>/Divide2'
+  /* Sum: '<S127>/Sum2' incorporates:
+   *  Product: '<S127>/Divide2'
    */
   q0 = rtu_err * rtu_I;
   if ((q0 < 0) && (rtu_ext_limProt < MIN_int32_T - q0)) {
@@ -641,15 +636,15 @@ int16_T PI_clamp_fixdt(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I, int32_T
     qY = q0 + rtu_ext_limProt;
   }
 
-  /* Delay: '<S77>/Resettable Delay' */
+  /* Delay: '<S130>/Resettable Delay' */
   if (localDW->icLoad) {
     localDW->ResettableDelay_DSTATE = rtu_init;
   }
 
-  /* Switch: '<S74>/Switch1' incorporates:
-   *  Constant: '<S74>/Constant'
-   *  Sum: '<S74>/Sum2'
-   *  UnitDelay: '<S74>/UnitDelay1'
+  /* Switch: '<S127>/Switch1' incorporates:
+   *  Constant: '<S127>/Constant'
+   *  Sum: '<S127>/Sum2'
+   *  UnitDelay: '<S127>/UnitDelay1'
    */
   if (localDW->UnitDelay1_DSTATE) {
     q0 = 0;
@@ -657,13 +652,13 @@ int16_T PI_clamp_fixdt(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I, int32_T
     q0 = qY;
   }
 
-  /* Sum: '<S77>/Sum1' incorporates:
-   *  Delay: '<S77>/Resettable Delay'
-   *  Switch: '<S74>/Switch1'
+  /* Sum: '<S130>/Sum1' incorporates:
+   *  Delay: '<S130>/Resettable Delay'
+   *  Switch: '<S127>/Switch1'
    */
   rtb_Sum1_k = q0 + localDW->ResettableDelay_DSTATE;
 
-  /* Product: '<S74>/Divide5' */
+  /* Product: '<S127>/Divide5' */
   q0 = (rtu_err * rtu_P) >> 11;
   if (q0 > 32767) {
     q0 = 32767;
@@ -671,10 +666,10 @@ int16_T PI_clamp_fixdt(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I, int32_T
     q0 = -32768;
   }
 
-  /* Sum: '<S74>/Sum1' incorporates:
-   *  DataTypeConversion: '<S77>/Data Type Conversion1'
-   *  Product: '<S74>/Divide5'
-   *  Sum: '<S77>/Sum1'
+  /* Sum: '<S127>/Sum1' incorporates:
+   *  DataTypeConversion: '<S130>/Data Type Conversion1'
+   *  Product: '<S127>/Divide5'
+   *  Sum: '<S130>/Sum1'
    */
   q0 = (((rtb_Sum1_k >> 16) << 1) + q0) >> 1;
   if (q0 > 32767) {
@@ -683,33 +678,33 @@ int16_T PI_clamp_fixdt(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I, int32_T
     q0 = -32768;
   }
 
-  /* RelationalOperator: '<S78>/LowerRelop1' incorporates:
-   *  Sum: '<S74>/Sum1'
+  /* RelationalOperator: '<S131>/LowerRelop1' incorporates:
+   *  Sum: '<S127>/Sum1'
    */
   rtb_LowerRelop1_e = (q0 > rtu_satMax);
 
-  /* RelationalOperator: '<S78>/UpperRelop' incorporates:
-   *  Sum: '<S74>/Sum1'
+  /* RelationalOperator: '<S131>/UpperRelop' incorporates:
+   *  Sum: '<S127>/Sum1'
    */
   rtb_UpperRelop_nh = (q0 < rtu_satMin);
 
-  /* Switch: '<S78>/Switch1' incorporates:
-   *  Sum: '<S74>/Sum1'
-   *  Switch: '<S78>/Switch3'
+  /* Switch: '<S131>/Switch1' incorporates:
+   *  Sum: '<S127>/Sum1'
+   *  Switch: '<S131>/Switch3'
    */
   if (rtb_LowerRelop1_e) {
     rty_out_0 = rtu_satMax;
   } else if (rtb_UpperRelop_nh) {
-    /* Switch: '<S78>/Switch3' */
+    /* Switch: '<S131>/Switch3' */
     rty_out_0 = rtu_satMin;
   } else {
     rty_out_0 = (int16_T)q0;
   }
 
-  /* End of Switch: '<S78>/Switch1' */
+  /* End of Switch: '<S131>/Switch1' */
 
-  /* Signum: '<S76>/SignDeltaU2' incorporates:
-   *  Sum: '<S74>/Sum2'
+  /* Signum: '<S129>/SignDeltaU2' incorporates:
+   *  Sum: '<S127>/Sum2'
    */
   if (qY < 0) {
     qY = -1;
@@ -717,8 +712,8 @@ int16_T PI_clamp_fixdt(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I, int32_T
     qY = (qY > 0);
   }
 
-  /* Signum: '<S76>/SignDeltaU3' incorporates:
-   *  Sum: '<S74>/Sum1'
+  /* Signum: '<S129>/SignDeltaU3' incorporates:
+   *  Sum: '<S127>/Sum1'
    */
   if (q0 < 0) {
     tmp = -1;
@@ -726,18 +721,18 @@ int16_T PI_clamp_fixdt(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I, int32_T
     tmp = (int16_T)(q0 > 0);
   }
 
-  /* Update for UnitDelay: '<S74>/UnitDelay1' incorporates:
-   *  Logic: '<S74>/AND1'
-   *  Logic: '<S76>/AND1'
-   *  RelationalOperator: '<S76>/Equal1'
-   *  Signum: '<S76>/SignDeltaU2'
-   *  Signum: '<S76>/SignDeltaU3'
+  /* Update for UnitDelay: '<S127>/UnitDelay1' incorporates:
+   *  Logic: '<S127>/AND1'
+   *  Logic: '<S129>/AND1'
+   *  RelationalOperator: '<S129>/Equal1'
+   *  Signum: '<S129>/SignDeltaU2'
+   *  Signum: '<S129>/SignDeltaU3'
    */
   localDW->UnitDelay1_DSTATE = ((qY == tmp) && (rtb_LowerRelop1_e ||
     rtb_UpperRelop_nh));
 
-  /* Update for Delay: '<S77>/Resettable Delay' incorporates:
-   *  Sum: '<S77>/Sum1'
+  /* Update for Delay: '<S130>/Resettable Delay' incorporates:
+   *  Sum: '<S130>/Sum1'
    */
   localDW->icLoad = false;
   localDW->ResettableDelay_DSTATE = rtb_Sum1_k;
@@ -889,150 +884,6 @@ int16_T PI_clamp_fixdt_j(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I,
   return rty_out_0;
 }
 
-/* System initialize for atomic system: '<S62>/PI_clamp_fixdt' */
-void PI_clamp_fixdt_d_Init(DW_PI_clamp_fixdt_e5 *localDW)
-{
-  /* InitializeConditions for Delay: '<S72>/Resettable Delay' */
-  localDW->icLoad = true;
-}
-
-/* System reset for atomic system: '<S62>/PI_clamp_fixdt' */
-void PI_clamp_fixdt_o_Reset(DW_PI_clamp_fixdt_e5 *localDW)
-{
-  /* InitializeConditions for UnitDelay: '<S69>/UnitDelay1' */
-  localDW->UnitDelay1_DSTATE = false;
-
-  /* InitializeConditions for Delay: '<S72>/Resettable Delay' */
-  localDW->icLoad = true;
-}
-
-/* Output and update for atomic system: '<S62>/PI_clamp_fixdt' */
-int16_T PI_clamp_fixdt_e(int16_T rtu_err, uint16_T rtu_P, uint16_T rtu_I,
-  int16_T rtu_init, int16_T rtu_satMax, int16_T rtu_satMin, int32_T
-  rtu_ext_limProt, DW_PI_clamp_fixdt_e5 *localDW)
-{
-  int16_T rty_out_0;
-  int32_T q0;
-  int32_T qY;
-  int16_T rtb_Sum1_la;
-  int16_T tmp;
-  boolean_T rtb_LowerRelop1_o;
-  boolean_T rtb_UpperRelop_ft;
-
-  /* Sum: '<S69>/Sum2' incorporates:
-   *  Product: '<S69>/Divide2'
-   */
-  q0 = rtu_err * rtu_I;
-  if ((q0 < 0) && (rtu_ext_limProt < MIN_int32_T - q0)) {
-    qY = MIN_int32_T;
-  } else if ((q0 > 0) && (rtu_ext_limProt > MAX_int32_T - q0)) {
-    qY = MAX_int32_T;
-  } else {
-    qY = q0 + rtu_ext_limProt;
-  }
-
-  /* Delay: '<S72>/Resettable Delay' */
-  if (localDW->icLoad) {
-    localDW->ResettableDelay_DSTATE = rtu_init;
-  }
-
-  /* Switch: '<S69>/Switch1' incorporates:
-   *  Constant: '<S69>/Constant'
-   *  Sum: '<S69>/Sum2'
-   *  UnitDelay: '<S69>/UnitDelay1'
-   */
-  if (localDW->UnitDelay1_DSTATE) {
-    tmp = 0;
-  } else {
-    tmp = (int16_T)(((qY < 0 ? 65535 : 0) + qY) >> 16);
-  }
-
-  /* Sum: '<S72>/Sum1' incorporates:
-   *  Delay: '<S72>/Resettable Delay'
-   *  Switch: '<S69>/Switch1'
-   */
-  rtb_Sum1_la = (int16_T)(tmp + localDW->ResettableDelay_DSTATE);
-
-  /* Product: '<S69>/Divide5' */
-  q0 = (rtu_err * rtu_P) >> 11;
-  if (q0 > 32767) {
-    q0 = 32767;
-  } else if (q0 < -32768) {
-    q0 = -32768;
-  }
-
-  /* Sum: '<S69>/Sum1' incorporates:
-   *  Product: '<S69>/Divide5'
-   *  Sum: '<S72>/Sum1'
-   */
-  q0 = ((rtb_Sum1_la << 1) + q0) >> 1;
-  if (q0 > 32767) {
-    q0 = 32767;
-  } else if (q0 < -32768) {
-    q0 = -32768;
-  }
-
-  /* RelationalOperator: '<S73>/LowerRelop1' incorporates:
-   *  Sum: '<S69>/Sum1'
-   */
-  rtb_LowerRelop1_o = (q0 > rtu_satMax);
-
-  /* RelationalOperator: '<S73>/UpperRelop' incorporates:
-   *  Sum: '<S69>/Sum1'
-   */
-  rtb_UpperRelop_ft = (q0 < rtu_satMin);
-
-  /* Switch: '<S73>/Switch1' incorporates:
-   *  Sum: '<S69>/Sum1'
-   *  Switch: '<S73>/Switch3'
-   */
-  if (rtb_LowerRelop1_o) {
-    rty_out_0 = rtu_satMax;
-  } else if (rtb_UpperRelop_ft) {
-    /* Switch: '<S73>/Switch3' */
-    rty_out_0 = rtu_satMin;
-  } else {
-    rty_out_0 = (int16_T)q0;
-  }
-
-  /* End of Switch: '<S73>/Switch1' */
-
-  /* Signum: '<S71>/SignDeltaU2' incorporates:
-   *  Sum: '<S69>/Sum2'
-   */
-  if (qY < 0) {
-    qY = -1;
-  } else {
-    qY = (qY > 0);
-  }
-
-  /* Signum: '<S71>/SignDeltaU3' incorporates:
-   *  Sum: '<S69>/Sum1'
-   */
-  if (q0 < 0) {
-    tmp = -1;
-  } else {
-    tmp = (int16_T)(q0 > 0);
-  }
-
-  /* Update for UnitDelay: '<S69>/UnitDelay1' incorporates:
-   *  Logic: '<S69>/AND1'
-   *  Logic: '<S71>/AND1'
-   *  RelationalOperator: '<S71>/Equal1'
-   *  Signum: '<S71>/SignDeltaU2'
-   *  Signum: '<S71>/SignDeltaU3'
-   */
-  localDW->UnitDelay1_DSTATE = ((qY == tmp) && (rtb_LowerRelop1_o ||
-    rtb_UpperRelop_ft));
-
-  /* Update for Delay: '<S72>/Resettable Delay' incorporates:
-   *  Sum: '<S72>/Sum1'
-   */
-  localDW->icLoad = false;
-  localDW->ResettableDelay_DSTATE = rtb_Sum1_la;
-  return rty_out_0;
-}
-
 /* Function for Chart: '<S5>/F03_02_Control_Mode_Manager' */
 void enter_internal_ACTIVE(const boolean_T *LogicalOperator1, const boolean_T
   *LogicalOperator2, DW *rtDW)
@@ -1066,10 +917,10 @@ void BLDC_controller_step(RT_MODEL *const rtM)
   int16_T Switch2;
   int16_T rtb_Merge;
   int16_T rtb_Merge1;
-  int16_T rtb_Merge_f_idx_2;
   int16_T rtb_Saturation;
   int16_T rtb_Saturation1;
   int16_T rtb_Switch3_h;
+  int16_T rtb_Switch_b;
   uint16_T rtb_Divide1;
   uint16_T rtb_f;
   int8_T UnitDelay3;
@@ -1367,12 +1218,12 @@ void BLDC_controller_step(RT_MODEL *const rtM)
     if (rtb_LogicalOperator) {
       /* MinMax: '<S14>/MinMax' */
       if (rtb_Switch3_h <= rtDW->z_counterRawPrev) {
-        rtb_Merge1 = rtb_Switch3_h;
+        rtb_Switch_b = rtb_Switch3_h;
       } else {
-        rtb_Merge1 = rtDW->z_counterRawPrev;
+        rtb_Switch_b = rtDW->z_counterRawPrev;
       }
 
-      rtb_Merge = (int16_T)(((int16_T)((int16_T)((rtb_Merge1 << 14) /
+      rtb_Merge = (int16_T)(((int16_T)((int16_T)((rtb_Switch_b << 14) /
         rtDW->z_counterRawPrev) * rtDW->Switch2_a) + (rtb_Sum2_ii << 14)) >> 2);
     } else {
       rtb_Merge = (int16_T)(rtb_Sum2_ii << 12);
@@ -1494,23 +1345,15 @@ void BLDC_controller_step(RT_MODEL *const rtM)
       /* Outputs for IfAction SubSystem: '<S49>/Clarke_PhasesAB' incorporates:
        *  ActionPort: '<S53>/Action Port'
        */
-      /* Gain: '<S53>/Gain4' incorporates:
-       *  Saturate: '<S1>/Saturation'
-       */
-      rtb_Switch1 = 18919 * rtb_Saturation;
-
-      /* Gain: '<S53>/Gain2' incorporates:
-       *  Saturate: '<S1>/Saturation1'
-       */
-      rtb_Sum1 = 18919 * rtb_Saturation1;
-
       /* Sum: '<S53>/Sum1' incorporates:
        *  Gain: '<S53>/Gain2'
        *  Gain: '<S53>/Gain4'
        *  Merge: '<S49>/Merge1'
+       *  Saturate: '<S1>/Saturation'
+       *  Saturate: '<S1>/Saturation1'
        */
-      rtb_Switch1 = (((rtb_Switch1 < 0 ? 32767 : 0) + rtb_Switch1) >> 15) +
-        (int16_T)(((rtb_Sum1 < 0 ? 16383 : 0) + rtb_Sum1) >> 14);
+      rtb_Switch1 = ((18919 * rtb_Saturation) >> 15) + (int16_T)((18919 *
+        rtb_Saturation1) >> 14);
       if (rtb_Switch1 > 32767) {
         rtb_Switch1 = 32767;
       } else if (rtb_Switch1 < -32768) {
@@ -1787,16 +1630,16 @@ void BLDC_controller_step(RT_MODEL *const rtM)
           /* Abs: '<S20>/Abs4' incorporates:
            *  UnitDelay: '<S8>/UnitDelay4'
            */
-          rtb_Merge1 = (int16_T)-rtDW->UnitDelay4_DSTATE_a;
+          rtb_Switch_b = (int16_T)-rtDW->UnitDelay4_DSTATE_a;
         } else {
           /* Abs: '<S20>/Abs4' incorporates:
            *  UnitDelay: '<S8>/UnitDelay4'
            */
-          rtb_Merge1 = rtDW->UnitDelay4_DSTATE_a;
+          rtb_Switch_b = rtDW->UnitDelay4_DSTATE_a;
         }
 
         rtb_RelationalOperator = (rtU->b_motEna && (Abs5 < rtP->n_stdStillDet) &&
-          (rtb_Merge1 > rtP->r_errInpTgtThres));
+          (rtb_Switch_b > rtP->r_errInpTgtThres));
       }
 
       /* End of Switch: '<S20>/Switch3' */
@@ -1941,7 +1784,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
        *  Constant: '<S36>/n_max'
        */
       tmp[0] = 0;
-      tmp[1] = rtP->Vd_max;
+      tmp[1] = 25232;
       tmp[2] = rtP->n_max;
       tmp[3] = rtP->i_max;
 
@@ -1949,11 +1792,11 @@ void BLDC_controller_step(RT_MODEL *const rtM)
 
       /* Saturate: '<S33>/Saturation' */
       if (rtU->r_inpTgt > 16000) {
-        rtb_Merge1 = 16000;
+        rtb_Switch_b = 16000;
       } else if (rtU->r_inpTgt < -16000) {
-        rtb_Merge1 = -16000;
+        rtb_Switch_b = -16000;
       } else {
-        rtb_Merge1 = rtU->r_inpTgt;
+        rtb_Switch_b = rtU->r_inpTgt;
       }
 
       /* Outputs for IfAction SubSystem: '<S33>/FOC_Control_Type' incorporates:
@@ -1965,8 +1808,8 @@ void BLDC_controller_step(RT_MODEL *const rtM)
        *  Saturate: '<S33>/Saturation'
        *  Selector: '<S36>/Selector'
        */
-      rtb_Merge1 = (int16_T)(((uint16_T)((tmp[rtU->z_ctrlModReq] << 5) / 125) *
-        rtb_Merge1) >> 12);
+      rtb_Saturation1 = (int16_T)(((uint16_T)((tmp[rtU->z_ctrlModReq] << 5) /
+        125) * rtb_Switch_b) >> 12);
 
       /* End of Outputs for SubSystem: '<S33>/FOC_Control_Type' */
     } else if (rtU->r_inpTgt > 16000) {
@@ -1977,7 +1820,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
        *  Merge: '<S33>/Merge'
        *  SignalConversion generated from: '<S34>/r_inpTgt'
        */
-      rtb_Merge1 = 16000;
+      rtb_Saturation1 = 16000;
 
       /* End of Outputs for SubSystem: '<S33>/Default_Control_Type' */
     } else if (rtU->r_inpTgt < -16000) {
@@ -1988,7 +1831,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
        *  Merge: '<S33>/Merge'
        *  SignalConversion generated from: '<S34>/r_inpTgt'
        */
-      rtb_Merge1 = -16000;
+      rtb_Saturation1 = -16000;
 
       /* End of Outputs for SubSystem: '<S33>/Default_Control_Type' */
     } else {
@@ -1998,7 +1841,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
       /* SignalConversion generated from: '<S34>/r_inpTgt' incorporates:
        *  Merge: '<S33>/Merge'
        */
-      rtb_Merge1 = rtU->r_inpTgt;
+      rtb_Saturation1 = rtU->r_inpTgt;
 
       /* End of Outputs for SubSystem: '<S33>/Default_Control_Type' */
     }
@@ -2134,7 +1977,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
        *  Merge: '<S33>/Merge'
        *  SignalConversion generated from: '<S35>/r_inpTgtScaRaw'
        */
-      rtDW->Merge1 = rtb_Merge1;
+      rtDW->Merge1 = rtb_Saturation1;
 
       /* End of Outputs for SubSystem: '<S33>/Default_Mode' */
     }
@@ -2212,14 +2055,14 @@ void BLDC_controller_step(RT_MODEL *const rtM)
        *  Switch: '<S43>/Switch'
        */
       if (Abs5 > rtP->n_fieldWeakAuthHi) {
-        rtb_Merge1 = rtP->n_fieldWeakAuthHi;
+        rtb_Switch_b = rtP->n_fieldWeakAuthHi;
       } else if (Abs5 < rtP->n_fieldWeakAuthLo) {
         /* Switch: '<S43>/Switch' incorporates:
          *  Constant: '<S42>/n_fieldWeakAuthLo'
          */
-        rtb_Merge1 = rtP->n_fieldWeakAuthLo;
+        rtb_Switch_b = rtP->n_fieldWeakAuthLo;
       } else {
-        rtb_Merge1 = Abs5;
+        rtb_Switch_b = Abs5;
       }
 
       /* Product: '<S42>/Divide1' incorporates:
@@ -2229,7 +2072,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
        *  Sum: '<S42>/Sum4'
        *  Switch: '<S43>/Switch2'
        */
-      rtb_Divide1 = (uint16_T)(((int16_T)(rtb_Merge1 - rtP->n_fieldWeakAuthLo) <<
+      rtb_Divide1 = (uint16_T)(((int16_T)(rtb_Switch_b - rtP->n_fieldWeakAuthLo) <<
         15) / (int16_T)(rtP->n_fieldWeakAuthHi - rtP->n_fieldWeakAuthLo));
 
       /* Switch: '<S42>/Switch1' incorporates:
@@ -2264,16 +2107,16 @@ void BLDC_controller_step(RT_MODEL *const rtM)
        *  RelationalOperator: '<S42>/Relational Operator1'
        */
       if (rtP->z_ctrlTypSel == 2) {
-        rtb_Merge1 = rtP->id_fieldWeakMax;
+        rtb_Switch_b = rtP->id_fieldWeakMax;
       } else {
-        rtb_Merge1 = rtP->a_phaAdvMax;
+        rtb_Switch_b = rtP->a_phaAdvMax;
       }
 
       /* Product: '<S42>/Divide3' incorporates:
        *  Switch: '<S42>/Switch1'
        *  Switch: '<S42>/Switch2'
        */
-      rtDW->Divide3 = (int16_T)((rtb_Merge1 * rtb_f) >> 15);
+      rtDW->Divide3 = (int16_T)((rtb_Switch_b * rtb_f) >> 15);
 
       /* End of Outputs for SubSystem: '<S6>/Field_Weakening_Enabled' */
     }
@@ -2299,47 +2142,47 @@ void BLDC_controller_step(RT_MODEL *const rtM)
 
     rtDW->If1_ActiveSubsystem_b = UnitDelay3;
     if ((rtb_Sum2_ii != UnitDelay3) && (rtb_Sum2_ii == 0)) {
-      /* Disable for SwitchCase: '<S80>/Switch Case' */
+      /* Disable for SwitchCase: '<S133>/Switch Case' */
       rtDW->SwitchCase_ActiveSubsystem_o = -1;
     }
 
     if (UnitDelay3 == 0) {
       /* Outputs for IfAction SubSystem: '<S48>/Motor_Limitations_Enabled' incorporates:
-       *  ActionPort: '<S80>/Action Port'
+       *  ActionPort: '<S133>/Action Port'
        */
-      /* Gain: '<S80>/Gain3' incorporates:
-       *  Constant: '<S80>/Vd_max1'
+      /* Gain: '<S133>/Gain3' incorporates:
+       *  Constant: '<S133>/Vd_max1'
        */
-      rtDW->Gain3 = (int16_T)-rtP->Vd_max;
+      rtDW->Gain3 = -25232;
 
-      /* SignalConversion generated from: '<S80>/Vd_max' incorporates:
-       *  Constant: '<S80>/Vd_max1'
+      /* SignalConversion generated from: '<S133>/Vd_max' incorporates:
+       *  Constant: '<S133>/Vd_max1'
        */
-      rtDW->OutportBufferForVd_max = rtP->Vd_max;
+      rtDW->OutportBufferForVd_max = 25232;
 
-      /* Abs: '<S80>/Abs5' incorporates:
+      /* Abs: '<S133>/Abs5' incorporates:
        *  UnitDelay: '<S7>/UnitDelay4'
        */
       if (rtDW->Switch1 < 0) {
-        rtb_Merge1 = (int16_T)-rtDW->Switch1;
+        rtb_Switch_b = (int16_T)-rtDW->Switch1;
       } else {
-        rtb_Merge1 = rtDW->Switch1;
+        rtb_Switch_b = rtDW->Switch1;
       }
 
-      /* Interpolation_n-D: '<S80>/Vq_max_M1' incorporates:
-       *  Abs: '<S80>/Abs5'
-       *  PreLookup: '<S80>/Vq_max_XA'
+      /* Interpolation_n-D: '<S133>/Vq_max_M1' incorporates:
+       *  Abs: '<S133>/Abs5'
+       *  PreLookup: '<S133>/Vq_max_XA'
        */
-      rtDW->Vq_max_M1 = rtP->Vq_max_M1[plook_u8s16_evencka(rtb_Merge1,
-        rtP->Vq_max_XA[0], (uint16_T)(rtP->Vq_max_XA[1] - rtP->Vq_max_XA[0]), 45U)];
+      rtDW->Vq_max_M1 = rtP->Vq_max_M1[plook_u8s16_evencka(rtb_Switch_b,
+        rtP->Vq_max_XA[0], (uint16_T)(rtP->Vq_max_XA[1] - rtP->Vq_max_XA[0]), 78U)];
 
-      /* Gain: '<S80>/Gain5' incorporates:
-       *  Interpolation_n-D: '<S80>/Vq_max_M1'
+      /* Gain: '<S133>/Gain5' incorporates:
+       *  Interpolation_n-D: '<S133>/Vq_max_M1'
        */
       rtDW->Gain5 = (int16_T)-rtDW->Vq_max_M1;
 
-      /* Product: '<S80>/Divide4' incorporates:
-       *  Constant: '<S80>/i_max'
+      /* Product: '<S133>/Divide4' incorporates:
+       *  Constant: '<S133>/i_max'
        *  SignalConversion generated from: '<S6>/r_fieldWeak '
        */
       rtb_Switch1 = rtDW->OutportBufferForr_fieldWeak << 16;
@@ -2351,37 +2194,37 @@ void BLDC_controller_step(RT_MODEL *const rtM)
         rtb_Switch1 = 65535;
       }
 
-      /* Product: '<S80>/Divide1' incorporates:
-       *  Constant: '<S80>/i_max'
-       *  Interpolation_n-D: '<S80>/iq_maxSca_M1'
-       *  PreLookup: '<S80>/iq_maxSca_XA'
-       *  Product: '<S80>/Divide4'
+      /* Product: '<S133>/Divide1' incorporates:
+       *  Constant: '<S133>/i_max'
+       *  Interpolation_n-D: '<S133>/iq_maxSca_M1'
+       *  PreLookup: '<S133>/iq_maxSca_XA'
+       *  Product: '<S133>/Divide4'
        */
       rtDW->Divide1_d = (int16_T)
         ((rtConstP.iq_maxSca_M1_Table[plook_u8u16_evencka((uint16_T)rtb_Switch1,
            0U, 1311U, 49U)] * rtP->i_max) >> 16);
 
-      /* Gain: '<S80>/Gain1' incorporates:
-       *  Product: '<S80>/Divide1'
+      /* Gain: '<S133>/Gain1' incorporates:
+       *  Product: '<S133>/Divide1'
        */
       rtDW->Gain1 = (int16_T)-rtDW->Divide1_d;
 
-      /* SwitchCase: '<S80>/Switch Case' incorporates:
+      /* SwitchCase: '<S133>/Switch Case' incorporates:
        *  Abs: '<S13>/Abs5'
-       *  Constant: '<S80>/n_max1'
-       *  Constant: '<S82>/Constant1'
-       *  Constant: '<S82>/cf_KbLimProt'
-       *  Constant: '<S82>/cf_nKiLimProt'
-       *  Constant: '<S83>/Constant'
-       *  Constant: '<S83>/Constant1'
-       *  Constant: '<S83>/cf_KbLimProt'
-       *  Constant: '<S83>/cf_iqKiLimProt'
-       *  Constant: '<S83>/cf_nKiLimProt'
-       *  Product: '<S80>/Divide1'
+       *  Constant: '<S133>/n_max1'
+       *  Constant: '<S135>/Constant1'
+       *  Constant: '<S135>/cf_KbLimProt'
+       *  Constant: '<S135>/cf_nKiLimProt'
+       *  Constant: '<S136>/Constant'
+       *  Constant: '<S136>/Constant1'
+       *  Constant: '<S136>/cf_KbLimProt'
+       *  Constant: '<S136>/cf_iqKiLimProt'
+       *  Constant: '<S136>/cf_nKiLimProt'
+       *  Product: '<S133>/Divide1'
        *  SignalConversion generated from: '<S45>/iqAbs'
-       *  Sum: '<S82>/Sum1'
-       *  Sum: '<S83>/Sum1'
-       *  Sum: '<S83>/Sum2'
+       *  Sum: '<S135>/Sum1'
+       *  Sum: '<S136>/Sum1'
+       *  Sum: '<S136>/Sum2'
        */
       rtb_Sum2_ii = rtDW->SwitchCase_ActiveSubsystem_o;
       UnitDelay3 = -1;
@@ -2403,108 +2246,108 @@ void BLDC_controller_step(RT_MODEL *const rtM)
       switch (UnitDelay3) {
        case 0:
         if (UnitDelay3 != rtb_Sum2_ii) {
-          /* SystemReset for IfAction SubSystem: '<S80>/Voltage_Mode_Protection' incorporates:
-           *  ActionPort: '<S83>/Action Port'
+          /* SystemReset for IfAction SubSystem: '<S133>/Voltage_Mode_Protection' incorporates:
+           *  ActionPort: '<S136>/Action Port'
            */
-          /* SystemReset for Atomic SubSystem: '<S83>/I_backCalc_fixdt' */
-          /* SystemReset for SwitchCase: '<S80>/Switch Case' */
+          /* SystemReset for Atomic SubSystem: '<S136>/I_backCalc_fixdt' */
+          /* SystemReset for SwitchCase: '<S133>/Switch Case' */
           I_backCalc_fixdt_Reset(65536000, &rtDW->I_backCalc_fixdt_c);
 
-          /* End of SystemReset for SubSystem: '<S83>/I_backCalc_fixdt' */
+          /* End of SystemReset for SubSystem: '<S136>/I_backCalc_fixdt' */
 
-          /* SystemReset for Atomic SubSystem: '<S83>/I_backCalc_fixdt1' */
+          /* SystemReset for Atomic SubSystem: '<S136>/I_backCalc_fixdt1' */
           I_backCalc_fixdt_Reset(65536000, &rtDW->I_backCalc_fixdt1);
 
-          /* End of SystemReset for SubSystem: '<S83>/I_backCalc_fixdt1' */
-          /* End of SystemReset for SubSystem: '<S80>/Voltage_Mode_Protection' */
+          /* End of SystemReset for SubSystem: '<S136>/I_backCalc_fixdt1' */
+          /* End of SystemReset for SubSystem: '<S133>/Voltage_Mode_Protection' */
         }
 
-        /* Outputs for IfAction SubSystem: '<S80>/Voltage_Mode_Protection' incorporates:
-         *  ActionPort: '<S83>/Action Port'
+        /* Outputs for IfAction SubSystem: '<S133>/Voltage_Mode_Protection' incorporates:
+         *  ActionPort: '<S136>/Action Port'
          */
-        /* Outputs for Atomic SubSystem: '<S83>/I_backCalc_fixdt' */
+        /* Outputs for Atomic SubSystem: '<S136>/I_backCalc_fixdt' */
         I_backCalc_fixdt((int16_T)(rtDW->Divide1_d - rtDW->OutportBufferForiqAbs),
                          rtP->cf_iqKiLimProt, rtP->cf_KbLimProt, rtDW->Abs1, 0,
                          &rtDW->Switch2_b, &rtDW->I_backCalc_fixdt_c);
 
-        /* End of Outputs for SubSystem: '<S83>/I_backCalc_fixdt' */
+        /* End of Outputs for SubSystem: '<S136>/I_backCalc_fixdt' */
 
-        /* Outputs for Atomic SubSystem: '<S83>/I_backCalc_fixdt1' */
+        /* Outputs for Atomic SubSystem: '<S136>/I_backCalc_fixdt1' */
         I_backCalc_fixdt((int16_T)(rtP->n_max - Abs5), rtP->cf_nKiLimProt,
                          rtP->cf_KbLimProt, rtDW->Abs1, 0, &rtDW->Switch2_p,
                          &rtDW->I_backCalc_fixdt1);
 
-        /* End of Outputs for SubSystem: '<S83>/I_backCalc_fixdt1' */
-        /* End of Outputs for SubSystem: '<S80>/Voltage_Mode_Protection' */
+        /* End of Outputs for SubSystem: '<S136>/I_backCalc_fixdt1' */
+        /* End of Outputs for SubSystem: '<S133>/Voltage_Mode_Protection' */
         break;
 
        case 1:
-        /* Outputs for IfAction SubSystem: '<S80>/Speed_Mode_Protection' incorporates:
-         *  ActionPort: '<S81>/Action Port'
+        /* Outputs for IfAction SubSystem: '<S133>/Speed_Mode_Protection' incorporates:
+         *  ActionPort: '<S134>/Action Port'
          */
-        /* Switch: '<S84>/Switch2' incorporates:
-         *  Gain: '<S80>/Gain1'
-         *  Product: '<S80>/Divide1'
-         *  RelationalOperator: '<S84>/LowerRelop1'
-         *  RelationalOperator: '<S84>/UpperRelop'
-         *  Switch: '<S84>/Switch'
+        /* Switch: '<S137>/Switch2' incorporates:
+         *  Gain: '<S133>/Gain1'
+         *  Product: '<S133>/Divide1'
+         *  RelationalOperator: '<S137>/LowerRelop1'
+         *  RelationalOperator: '<S137>/UpperRelop'
+         *  Switch: '<S137>/Switch'
          */
         if (rtY->iq > rtDW->Divide1_d) {
-          rtb_Merge1 = rtDW->Divide1_d;
+          rtb_Switch_b = rtDW->Divide1_d;
         } else if (rtY->iq < rtDW->Gain1) {
-          /* Switch: '<S84>/Switch' incorporates:
-           *  Gain: '<S80>/Gain1'
+          /* Switch: '<S137>/Switch' incorporates:
+           *  Gain: '<S133>/Gain1'
            */
-          rtb_Merge1 = rtDW->Gain1;
+          rtb_Switch_b = rtDW->Gain1;
         } else {
-          rtb_Merge1 = rtY->iq;
+          rtb_Switch_b = rtY->iq;
         }
 
-        /* Product: '<S81>/Divide1' incorporates:
-         *  Constant: '<S81>/cf_iqKiLimProt'
-         *  Sum: '<S81>/Sum3'
-         *  Switch: '<S84>/Switch2'
+        /* Product: '<S134>/Divide1' incorporates:
+         *  Constant: '<S134>/cf_iqKiLimProt'
+         *  Sum: '<S134>/Sum3'
+         *  Switch: '<S137>/Switch2'
          */
-        rtDW->Divide1 = (int16_T)(rtb_Merge1 - rtY->iq) * rtP->cf_iqKiLimProt;
+        rtDW->Divide1 = (int16_T)(rtb_Switch_b - rtY->iq) * rtP->cf_iqKiLimProt;
 
-        /* End of Outputs for SubSystem: '<S80>/Speed_Mode_Protection' */
+        /* End of Outputs for SubSystem: '<S133>/Speed_Mode_Protection' */
         break;
 
        case 2:
         if (UnitDelay3 != rtb_Sum2_ii) {
-          /* SystemReset for IfAction SubSystem: '<S80>/Torque_Mode_Protection' incorporates:
-           *  ActionPort: '<S82>/Action Port'
+          /* SystemReset for IfAction SubSystem: '<S133>/Torque_Mode_Protection' incorporates:
+           *  ActionPort: '<S135>/Action Port'
            */
-          /* SystemReset for Atomic SubSystem: '<S82>/I_backCalc_fixdt' */
-          /* SystemReset for SwitchCase: '<S80>/Switch Case' */
+          /* SystemReset for Atomic SubSystem: '<S135>/I_backCalc_fixdt' */
+          /* SystemReset for SwitchCase: '<S133>/Switch Case' */
           I_backCalc_fixdt_Reset(58982400, &rtDW->I_backCalc_fixdt_h);
 
-          /* End of SystemReset for SubSystem: '<S82>/I_backCalc_fixdt' */
-          /* End of SystemReset for SubSystem: '<S80>/Torque_Mode_Protection' */
+          /* End of SystemReset for SubSystem: '<S135>/I_backCalc_fixdt' */
+          /* End of SystemReset for SubSystem: '<S133>/Torque_Mode_Protection' */
         }
 
-        /* Outputs for IfAction SubSystem: '<S80>/Torque_Mode_Protection' incorporates:
-         *  ActionPort: '<S82>/Action Port'
+        /* Outputs for IfAction SubSystem: '<S133>/Torque_Mode_Protection' incorporates:
+         *  ActionPort: '<S135>/Action Port'
          */
-        /* Outputs for Atomic SubSystem: '<S82>/I_backCalc_fixdt' */
+        /* Outputs for Atomic SubSystem: '<S135>/I_backCalc_fixdt' */
         I_backCalc_fixdt((int16_T)(rtP->n_max - Abs5), rtP->cf_nKiLimProt,
                          rtP->cf_KbLimProt, rtDW->Vq_max_M1, 0, &rtDW->Switch2_g,
                          &rtDW->I_backCalc_fixdt_h);
 
-        /* End of Outputs for SubSystem: '<S82>/I_backCalc_fixdt' */
-        /* End of Outputs for SubSystem: '<S80>/Torque_Mode_Protection' */
+        /* End of Outputs for SubSystem: '<S135>/I_backCalc_fixdt' */
+        /* End of Outputs for SubSystem: '<S133>/Torque_Mode_Protection' */
         break;
       }
 
-      /* End of SwitchCase: '<S80>/Switch Case' */
+      /* End of SwitchCase: '<S133>/Switch Case' */
 
-      /* Gain: '<S80>/Gain4' incorporates:
-       *  Constant: '<S80>/i_max'
+      /* Gain: '<S133>/Gain4' incorporates:
+       *  Constant: '<S133>/i_max'
        */
       rtDW->Gain4 = (int16_T)-rtP->i_max;
 
-      /* SignalConversion generated from: '<S80>/id_max' incorporates:
-       *  Constant: '<S80>/i_max'
+      /* SignalConversion generated from: '<S133>/id_max' incorporates:
+       *  Constant: '<S133>/i_max'
        */
       rtDW->OutportBufferForid_max = rtP->i_max;
 
@@ -2569,59 +2412,59 @@ void BLDC_controller_step(RT_MODEL *const rtM)
          */
         /* MinMax: '<S64>/MinMax' incorporates:
          *  Abs: '<S5>/Abs1'
-         *  Switch: '<S91>/Switch2'
-         *  Switch: '<S93>/Switch2'
+         *  Switch: '<S144>/Switch2'
+         *  Switch: '<S146>/Switch2'
          */
         if (rtDW->Abs1 <= rtDW->Switch2_b) {
-          rtb_Saturation = rtDW->Abs1;
+          rtb_Merge1 = rtDW->Abs1;
         } else {
-          rtb_Saturation = rtDW->Switch2_b;
+          rtb_Merge1 = rtDW->Switch2_b;
         }
 
-        if (rtb_Saturation > rtDW->Switch2_p) {
-          rtb_Saturation = rtDW->Switch2_p;
+        if (rtb_Merge1 > rtDW->Switch2_p) {
+          rtb_Merge1 = rtDW->Switch2_p;
         }
 
         /* Signum: '<S64>/SignDeltaU2' incorporates:
          *  Merge: '<S33>/Merge1'
          */
         if (rtDW->Merge1 < 0) {
-          rtb_Merge1 = -1;
+          rtb_Switch_b = -1;
         } else {
-          rtb_Merge1 = (int16_T)(rtDW->Merge1 > 0);
+          rtb_Switch_b = (int16_T)(rtDW->Merge1 > 0);
         }
 
         /* Product: '<S64>/Divide1' incorporates:
          *  MinMax: '<S64>/MinMax'
          *  Signum: '<S64>/SignDeltaU2'
          */
-        rtb_Merge1 *= rtb_Saturation;
+        rtb_Saturation1 = (int16_T)(rtb_Merge1 * rtb_Switch_b);
 
-        /* Switch: '<S79>/Switch2' incorporates:
-         *  Gain: '<S80>/Gain5'
-         *  Interpolation_n-D: '<S80>/Vq_max_M1'
+        /* Switch: '<S132>/Switch2' incorporates:
+         *  Gain: '<S133>/Gain5'
+         *  Interpolation_n-D: '<S133>/Vq_max_M1'
          *  Product: '<S64>/Divide1'
-         *  RelationalOperator: '<S79>/LowerRelop1'
-         *  RelationalOperator: '<S79>/UpperRelop'
-         *  Switch: '<S79>/Switch'
+         *  RelationalOperator: '<S132>/LowerRelop1'
+         *  RelationalOperator: '<S132>/UpperRelop'
+         *  Switch: '<S132>/Switch'
          */
-        if (rtb_Merge1 > rtDW->Vq_max_M1) {
+        if (rtb_Saturation1 > rtDW->Vq_max_M1) {
           /* Merge: '<S59>/Merge' */
           rtDW->Merge = rtDW->Vq_max_M1;
-        } else if (rtb_Merge1 < rtDW->Gain5) {
-          /* Switch: '<S79>/Switch' incorporates:
-           *  Gain: '<S80>/Gain5'
+        } else if (rtb_Saturation1 < rtDW->Gain5) {
+          /* Switch: '<S132>/Switch' incorporates:
+           *  Gain: '<S133>/Gain5'
            *  Merge: '<S59>/Merge'
            */
           rtDW->Merge = rtDW->Gain5;
         } else {
           /* Merge: '<S59>/Merge' incorporates:
-           *  Switch: '<S79>/Switch'
+           *  Switch: '<S132>/Switch'
            */
-          rtDW->Merge = rtb_Merge1;
+          rtDW->Merge = rtb_Saturation1;
         }
 
-        /* End of Switch: '<S79>/Switch2' */
+        /* End of Switch: '<S132>/Switch2' */
         /* End of Outputs for SubSystem: '<S59>/Voltage_Mode' */
         break;
 
@@ -2644,7 +2487,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
         /* DataTypeConversion: '<S61>/Data Type Conversion2' incorporates:
          *  Constant: '<S61>/n_cruiseMotTgt'
          */
-        rtb_Merge1 = (int16_T)(rtP->n_cruiseMotTgt << 4);
+        rtb_Saturation1 = (int16_T)(rtP->n_cruiseMotTgt << 4);
 
         /* Switch: '<S61>/Switch4' incorporates:
          *  Constant: '<S1>/b_cruiseCtrlEna'
@@ -2652,18 +2495,18 @@ void BLDC_controller_step(RT_MODEL *const rtM)
          *  Logic: '<S61>/Logical Operator1'
          *  RelationalOperator: '<S61>/Relational Operator3'
          */
-        if (rtP->b_cruiseCtrlEna && (rtb_Merge1 != 0)) {
+        if (rtP->b_cruiseCtrlEna && (rtb_Saturation1 != 0)) {
           /* Switch: '<S61>/Switch3' incorporates:
-           *  Interpolation_n-D: '<S80>/Vq_max_M1'
+           *  Interpolation_n-D: '<S133>/Vq_max_M1'
            *  Merge: '<S33>/Merge1'
            *  MinMax: '<S61>/MinMax4'
            */
-          if (rtb_Merge1 > 0) {
+          if (rtb_Saturation1 > 0) {
             /* Switch: '<S61>/Switch4' */
             rtb_TmpSignalConversionAtLow_Pa[0] = rtDW->Vq_max_M1;
 
             /* MinMax: '<S61>/MinMax3' incorporates:
-             *  Gain: '<S80>/Gain5'
+             *  Gain: '<S133>/Gain5'
              *  Merge: '<S33>/Merge1'
              */
             if (rtDW->Merge1 >= rtDW->Gain5) {
@@ -2678,7 +2521,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
           } else {
             if (rtDW->Vq_max_M1 <= rtDW->Merge1) {
               /* MinMax: '<S61>/MinMax4' incorporates:
-               *  Interpolation_n-D: '<S80>/Vq_max_M1'
+               *  Interpolation_n-D: '<S133>/Vq_max_M1'
                *  Switch: '<S61>/Switch4'
                */
               rtb_TmpSignalConversionAtLow_Pa[0] = rtDW->Vq_max_M1;
@@ -2707,14 +2550,14 @@ void BLDC_controller_step(RT_MODEL *const rtM)
          *  Merge: '<S33>/Merge1'
          */
         if (!rtP->b_cruiseCtrlEna) {
-          rtb_Merge1 = rtDW->Merge1;
+          rtb_Saturation1 = rtDW->Merge1;
         }
 
         /* Sum: '<S61>/Sum3' incorporates:
          *  Switch: '<S13>/Switch2'
          *  Switch: '<S61>/Switch2'
          */
-        rtb_Switch1 = rtb_Merge1 - Switch2;
+        rtb_Switch1 = rtb_Saturation1 - Switch2;
         if (rtb_Switch1 > 32767) {
           rtb_Switch1 = 32767;
         } else if (rtb_Switch1 < -32768) {
@@ -2733,85 +2576,219 @@ void BLDC_controller_step(RT_MODEL *const rtM)
 
        case 2:
         if (UnitDelay3 != rtb_Sum2_ii) {
-          /* SystemReset for IfAction SubSystem: '<S59>/Torque_Mode' incorporates:
+          /* InitializeConditions for IfAction SubSystem: '<S59>/Torque_Mode' incorporates:
            *  ActionPort: '<S62>/Action Port'
            */
-          /* SystemReset for Atomic SubSystem: '<S62>/PI_clamp_fixdt' */
-          /* SystemReset for SwitchCase: '<S59>/Switch Case' */
-          PI_clamp_fixdt_o_Reset(&rtDW->PI_clamp_fixdt_eq);
+          /* InitializeConditions for SwitchCase: '<S59>/Switch Case' incorporates:
+           *  DiscreteIntegrator: '<S108>/Integrator'
+           */
+          rtDW->Integrator_IC_LOADING = 1U;
 
-          /* End of SystemReset for SubSystem: '<S62>/PI_clamp_fixdt' */
-          /* End of SystemReset for SubSystem: '<S59>/Torque_Mode' */
+          /* End of InitializeConditions for SubSystem: '<S59>/Torque_Mode' */
         }
 
         /* Outputs for IfAction SubSystem: '<S59>/Torque_Mode' incorporates:
          *  ActionPort: '<S62>/Action Port'
          */
         /* Switch: '<S70>/Switch2' incorporates:
-         *  Gain: '<S80>/Gain1'
+         *  Gain: '<S133>/Gain1'
          *  Merge: '<S33>/Merge1'
-         *  Product: '<S80>/Divide1'
+         *  Product: '<S133>/Divide1'
          *  RelationalOperator: '<S70>/LowerRelop1'
          *  RelationalOperator: '<S70>/UpperRelop'
          *  Switch: '<S70>/Switch'
          */
         if (rtDW->Merge1 > rtDW->Divide1_d) {
-          rtb_Merge1 = rtDW->Divide1_d;
+          rtb_Switch_b = rtDW->Divide1_d;
         } else if (rtDW->Merge1 < rtDW->Gain1) {
           /* Switch: '<S70>/Switch' incorporates:
-           *  Gain: '<S80>/Gain1'
+           *  Gain: '<S133>/Gain1'
            */
-          rtb_Merge1 = rtDW->Gain1;
+          rtb_Switch_b = rtDW->Gain1;
         } else {
-          rtb_Merge1 = rtDW->Merge1;
+          rtb_Switch_b = rtDW->Merge1;
         }
 
         /* Sum: '<S62>/Sum2' incorporates:
          *  Switch: '<S70>/Switch2'
          */
-        rtb_Switch1 = rtb_Merge1 - rtY->iq;
+        rtb_Switch1 = rtb_Switch_b - rtY->iq;
         if (rtb_Switch1 > 32767) {
           rtb_Switch1 = 32767;
         } else if (rtb_Switch1 < -32768) {
           rtb_Switch1 = -32768;
         }
 
-        /* MinMax: '<S62>/MinMax1' incorporates:
-         *  Interpolation_n-D: '<S80>/Vq_max_M1'
-         *  Switch: '<S87>/Switch2'
-         */
-        if (rtDW->Vq_max_M1 <= rtDW->Switch2_g) {
-          rtb_Merge1 = rtDW->Vq_max_M1;
-        } else {
-          rtb_Merge1 = rtDW->Switch2_g;
-        }
-
-        /* MinMax: '<S62>/MinMax2' incorporates:
-         *  Gain: '<S62>/Gain4'
-         *  Gain: '<S80>/Gain5'
-         *  Switch: '<S87>/Switch2'
-         */
-        if ((int16_T)-rtDW->Switch2_g >= rtDW->Gain5) {
-          rtb_Saturation = (int16_T)-rtDW->Switch2_g;
-        } else {
-          rtb_Saturation = rtDW->Gain5;
-        }
-
-        /* Outputs for Atomic SubSystem: '<S62>/PI_clamp_fixdt' */
-        /* Merge: '<S59>/Merge' incorporates:
-         *  Constant: '<S62>/cf_iqKi'
-         *  Constant: '<S62>/cf_iqKp'
-         *  Constant: '<S62>/constant2'
-         *  MinMax: '<S62>/MinMax1'
-         *  MinMax: '<S62>/MinMax2'
-         *  Sum: '<S62>/Sum2'
+        /* DiscreteIntegrator: '<S108>/Integrator' incorporates:
          *  UnitDelay: '<S8>/UnitDelay4'
          */
-        rtDW->Merge = PI_clamp_fixdt_e((int16_T)rtb_Switch1, rtP->cf_iqKp,
-          rtP->cf_iqKi, rtDW->UnitDelay4_DSTATE_a, rtb_Merge1, rtb_Saturation, 0,
-          &rtDW->PI_clamp_fixdt_eq);
+        if (rtDW->Integrator_IC_LOADING != 0) {
+          rtDW->Integrator_DSTATE = rtDW->UnitDelay4_DSTATE_a;
+        }
 
-        /* End of Outputs for SubSystem: '<S62>/PI_clamp_fixdt' */
+        /* Product: '<S113>/PProd Out' incorporates:
+         *  Constant: '<S62>/cf_iqKp'
+         *  DataTypeConversion: '<S62>/Data Type Conversion1'
+         *  Sum: '<S62>/Sum2'
+         */
+        rtb_Sum1 = ((uint16_T)(rtP->cf_iqKp * 4096.0F) * rtb_Switch1) >> 12;
+        if (rtb_Sum1 > 32767) {
+          rtb_Sum1 = 32767;
+        } else if (rtb_Sum1 < -32768) {
+          rtb_Sum1 = -32768;
+        }
+
+        /* Sum: '<S118>/Sum' incorporates:
+         *  DiscreteIntegrator: '<S108>/Integrator'
+         *  Product: '<S113>/PProd Out'
+         */
+        rtb_Sum1 += rtDW->Integrator_DSTATE;
+        if (rtb_Sum1 > 32767) {
+          rtb_Sum1 = 32767;
+        } else if (rtb_Sum1 < -32768) {
+          rtb_Sum1 = -32768;
+        }
+
+        /* MinMax: '<S62>/MinMax1' incorporates:
+         *  Interpolation_n-D: '<S133>/Vq_max_M1'
+         *  Switch: '<S116>/Switch2'
+         *  Switch: '<S140>/Switch2'
+         */
+        if (rtDW->Vq_max_M1 <= rtDW->Switch2_g) {
+          rtb_Saturation1 = rtDW->Vq_max_M1;
+        } else {
+          rtb_Saturation1 = rtDW->Switch2_g;
+        }
+
+        /* End of MinMax: '<S62>/MinMax1' */
+
+        /* MinMax: '<S62>/MinMax2' incorporates:
+         *  Gain: '<S133>/Gain5'
+         *  Gain: '<S62>/Gain4'
+         *  Switch: '<S140>/Switch2'
+         */
+        if ((int16_T)-rtDW->Switch2_g >= rtDW->Gain5) {
+          rtb_Merge1 = (int16_T)-rtDW->Switch2_g;
+        } else {
+          rtb_Merge1 = rtDW->Gain5;
+        }
+
+        /* End of MinMax: '<S62>/MinMax2' */
+
+        /* Switch: '<S100>/Switch' incorporates:
+         *  MinMax: '<S62>/MinMax2'
+         *  RelationalOperator: '<S100>/u_GTE_up'
+         *  RelationalOperator: '<S100>/u_GT_lo'
+         *  Sum: '<S118>/Sum'
+         *  Switch: '<S100>/Switch1'
+         *  Switch: '<S116>/Switch2'
+         */
+        if (rtb_Sum1 >= rtb_Saturation1) {
+          rtb_Switch_b = rtb_Saturation1;
+        } else if (rtb_Sum1 > rtb_Merge1) {
+          /* Switch: '<S100>/Switch1' */
+          rtb_Switch_b = (int16_T)rtb_Sum1;
+        } else {
+          rtb_Switch_b = rtb_Merge1;
+        }
+
+        /* Sum: '<S100>/Diff' incorporates:
+         *  Product: '<S105>/IProd Out'
+         *  Sum: '<S118>/Sum'
+         *  Switch: '<S100>/Switch'
+         */
+        rtb_Switch_b = (int16_T)(rtb_Sum1 - rtb_Switch_b);
+
+        /* RelationalOperator: '<S97>/Relational Operator' incorporates:
+         *  Product: '<S105>/IProd Out'
+         */
+        rtb_RelationalOperator = (rtb_Switch_b != 0);
+
+        /* Switch: '<S97>/Switch1' incorporates:
+         *  Constant: '<S97>/Constant'
+         *  Constant: '<S97>/Constant2'
+         *  Product: '<S105>/IProd Out'
+         *  RelationalOperator: '<S97>/fix for DT propagation issue'
+         */
+        if (rtb_Switch_b > 0) {
+          rtb_Sum2_ii = 1;
+        } else {
+          rtb_Sum2_ii = -1;
+        }
+
+        /* End of Switch: '<S97>/Switch1' */
+
+        /* Product: '<S105>/IProd Out' incorporates:
+         *  Constant: '<S62>/cf_iqKi'
+         *  DataTypeConversion: '<S62>/Data Type Conversion20'
+         *  Sum: '<S62>/Sum2'
+         */
+        rtb_Switch_b = (int16_T)(((uint16_T)(rtP->cf_iqKi * 65536.0F) *
+          rtb_Switch1) >> 16);
+
+        /* Switch: '<S116>/Switch2' incorporates:
+         *  RelationalOperator: '<S116>/LowerRelop1'
+         *  Sum: '<S118>/Sum'
+         */
+        if (rtb_Sum1 <= rtb_Saturation1) {
+          /* Switch: '<S116>/Switch' incorporates:
+           *  MinMax: '<S62>/MinMax2'
+           *  RelationalOperator: '<S116>/UpperRelop'
+           */
+          if (rtb_Sum1 < rtb_Merge1) {
+            rtb_Saturation1 = rtb_Merge1;
+          } else {
+            rtb_Saturation1 = (int16_T)rtb_Sum1;
+          }
+
+          /* End of Switch: '<S116>/Switch' */
+        }
+
+        /* End of Switch: '<S116>/Switch2' */
+
+        /* Merge: '<S59>/Merge' incorporates:
+         *  SignalConversion: '<S62>/Signal Conversion2'
+         *  Switch: '<S116>/Switch2'
+         */
+        rtDW->Merge = rtb_Saturation1;
+
+        /* Update for DiscreteIntegrator: '<S108>/Integrator' */
+        rtDW->Integrator_IC_LOADING = 0U;
+
+        /* Switch: '<S97>/Switch2' incorporates:
+         *  Constant: '<S97>/Constant3'
+         *  Constant: '<S97>/Constant4'
+         *  Product: '<S105>/IProd Out'
+         *  RelationalOperator: '<S97>/fix for DT propagation issue1'
+         */
+        if (rtb_Switch_b > 0) {
+          UnitDelay3 = 1;
+        } else {
+          UnitDelay3 = -1;
+        }
+
+        /* Switch: '<S97>/Switch' incorporates:
+         *  Constant: '<S97>/Constant1'
+         *  Logic: '<S97>/AND3'
+         *  RelationalOperator: '<S97>/Equal1'
+         *  Switch: '<S97>/Switch2'
+         */
+        if (rtb_RelationalOperator && (rtb_Sum2_ii == UnitDelay3)) {
+          rtb_Switch_b = 0;
+        }
+
+        /* Update for DiscreteIntegrator: '<S108>/Integrator' incorporates:
+         *  Switch: '<S97>/Switch'
+         */
+        rtb_Switch1 = rtDW->Integrator_DSTATE + rtb_Switch_b;
+        if (rtb_Switch1 > 32767) {
+          rtb_Switch1 = 32767;
+        } else if (rtb_Switch1 < -32768) {
+          rtb_Switch1 = -32768;
+        }
+
+        rtDW->Integrator_DSTATE = (int16_T)rtb_Switch1;
+
         /* End of Outputs for SubSystem: '<S59>/Torque_Mode' */
         break;
 
@@ -2836,6 +2813,8 @@ void BLDC_controller_step(RT_MODEL *const rtM)
        *  Constant: '<S63>/cf_idKp1'
        *  Constant: '<S63>/constant1'
        *  Constant: '<S63>/constant2'
+       *  DataTypeConversion: '<S63>/Data Type Conversion1'
+       *  DataTypeConversion: '<S63>/Data Type Conversion20'
        *  Sum: '<S63>/Sum3'
        */
       rtb_Sum2_ii = rtDW->If1_ActiveSubsystem_a;
@@ -2852,7 +2831,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
            */
           /* SystemReset for Atomic SubSystem: '<S63>/PI_clamp_fixdt' */
           /* SystemReset for If: '<S59>/If1' */
-          PI_clamp_fixdt_Reset(&rtDW->PI_clamp_fixdt_eo);
+          PI_clamp_fixdt_Reset(&rtDW->PI_clamp_fixdt_e);
 
           /* End of SystemReset for SubSystem: '<S63>/PI_clamp_fixdt' */
           /* End of SystemReset for SubSystem: '<S59>/Vd_Calculation' */
@@ -2864,34 +2843,34 @@ void BLDC_controller_step(RT_MODEL *const rtM)
         /* Gain: '<S63>/toNegative' incorporates:
          *  SignalConversion generated from: '<S6>/r_fieldWeak '
          */
-        rtb_Merge1 = (int16_T)-rtDW->OutportBufferForr_fieldWeak;
+        rtb_Saturation1 = (int16_T)-rtDW->OutportBufferForr_fieldWeak;
 
-        /* Switch: '<S75>/Switch2' incorporates:
+        /* Switch: '<S128>/Switch2' incorporates:
+         *  Gain: '<S133>/Gain4'
          *  Gain: '<S63>/toNegative'
-         *  Gain: '<S80>/Gain4'
-         *  RelationalOperator: '<S75>/LowerRelop1'
-         *  RelationalOperator: '<S75>/UpperRelop'
+         *  RelationalOperator: '<S128>/LowerRelop1'
+         *  RelationalOperator: '<S128>/UpperRelop'
+         *  SignalConversion generated from: '<S133>/id_max'
          *  SignalConversion generated from: '<S6>/r_fieldWeak '
-         *  SignalConversion generated from: '<S80>/id_max'
-         *  Switch: '<S75>/Switch'
+         *  Switch: '<S128>/Switch'
          */
         if ((int16_T)-rtDW->OutportBufferForr_fieldWeak >
             rtDW->OutportBufferForid_max) {
-          rtb_Merge1 = rtDW->OutportBufferForid_max;
+          rtb_Saturation1 = rtDW->OutportBufferForid_max;
         } else if ((int16_T)-rtDW->OutportBufferForr_fieldWeak < rtDW->Gain4) {
-          /* Switch: '<S75>/Switch' incorporates:
-           *  Gain: '<S80>/Gain4'
-           *  Switch: '<S75>/Switch2'
+          /* Switch: '<S128>/Switch' incorporates:
+           *  Gain: '<S133>/Gain4'
+           *  Switch: '<S128>/Switch2'
            */
-          rtb_Merge1 = rtDW->Gain4;
+          rtb_Saturation1 = rtDW->Gain4;
         }
 
-        /* End of Switch: '<S75>/Switch2' */
+        /* End of Switch: '<S128>/Switch2' */
 
         /* Sum: '<S63>/Sum3' incorporates:
-         *  Switch: '<S75>/Switch2'
+         *  Switch: '<S128>/Switch2'
          */
-        rtb_Switch1 = rtb_Merge1 - rtY->id;
+        rtb_Switch1 = rtb_Saturation1 - rtY->id;
         if (rtb_Switch1 > 32767) {
           rtb_Switch1 = 32767;
         } else if (rtb_Switch1 < -32768) {
@@ -2899,9 +2878,9 @@ void BLDC_controller_step(RT_MODEL *const rtM)
         }
 
         /* Outputs for Atomic SubSystem: '<S63>/PI_clamp_fixdt' */
-        rtDW->Switch1 = PI_clamp_fixdt((int16_T)rtb_Switch1, rtP->cf_idKp,
-          rtP->cf_idKi, 0, rtDW->OutportBufferForVd_max, rtDW->Gain3, 0,
-          &rtDW->PI_clamp_fixdt_eo);
+        rtDW->Switch1 = PI_clamp_fixdt((int16_T)rtb_Switch1, (uint16_T)
+          (rtP->cf_idKp * 4096.0F), (uint16_T)(rtP->cf_idKi * 65536.0F), 0,
+          rtDW->OutportBufferForVd_max, rtDW->Gain3, 0, &rtDW->PI_clamp_fixdt_e);
 
         /* End of Outputs for SubSystem: '<S63>/PI_clamp_fixdt' */
         /* End of Outputs for SubSystem: '<S59>/Vd_Calculation' */
@@ -2928,10 +2907,10 @@ void BLDC_controller_step(RT_MODEL *const rtM)
   rtb_Sum2_ii = rtDW->If2_ActiveSubsystem;
   UnitDelay3 = -1;
   if (rtP->z_ctrlTypSel == 2) {
-    rtb_Merge1 = rtDW->Merge;
+    rtb_Saturation1 = rtDW->Merge;
     UnitDelay3 = 0;
   } else {
-    rtb_Merge1 = rtDW->Merge1;
+    rtb_Saturation1 = rtDW->Merge1;
   }
 
   rtDW->If2_ActiveSubsystem = UnitDelay3;
@@ -2954,7 +2933,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
      *  Merge: '<S59>/Merge'
      *  Product: '<S58>/Divide1'
      *  Product: '<S58>/Divide4'
-     *  Switch: '<S78>/Switch1'
+     *  Switch: '<S131>/Switch1'
      */
     rtb_Switch1 = (int16_T)((rtDW->Switch1 * rtDW->r_cos_M1_1) >> 14) - (int16_T)
       ((rtDW->Merge * rtDW->r_sin_M1_1) >> 14);
@@ -2970,7 +2949,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
      *  Merge: '<S59>/Merge'
      *  Product: '<S58>/Divide2'
      *  Product: '<S58>/Divide3'
-     *  Switch: '<S78>/Switch1'
+     *  Switch: '<S131>/Switch1'
      */
     rtb_Sum1 = (int16_T)((rtDW->Switch1 * rtDW->r_sin_M1_1) >> 14) + (int16_T)
       ((rtDW->Merge * rtDW->r_cos_M1_1) >> 14);
@@ -3012,20 +2991,20 @@ void BLDC_controller_step(RT_MODEL *const rtM)
     /* MinMax: '<S57>/MinMax1' incorporates:
      *  Sum: '<S58>/Sum6'
      */
-    rtb_Saturation = (int16_T)rtb_Switch1;
+    rtb_Merge1 = (int16_T)rtb_Switch1;
 
     /* MinMax: '<S57>/MinMax2' incorporates:
      *  MinMax: '<S57>/MinMax1'
      *  Sum: '<S58>/Sum6'
      */
-    rtb_Saturation1 = (int16_T)rtb_Switch1;
+    rtb_Switch_b = (int16_T)rtb_Switch1;
 
     /* MinMax: '<S57>/MinMax1' incorporates:
      *  Sum: '<S57>/Sum6'
      *  Sum: '<S58>/Sum6'
      */
     if (rtb_Switch1 > rtb_Sum1) {
-      rtb_Saturation = (int16_T)rtb_Sum1;
+      rtb_Merge1 = (int16_T)rtb_Sum1;
     }
 
     /* MinMax: '<S57>/MinMax2' incorporates:
@@ -3033,28 +3012,28 @@ void BLDC_controller_step(RT_MODEL *const rtM)
      *  Sum: '<S58>/Sum6'
      */
     if (rtb_Switch1 < rtb_Sum1) {
-      rtb_Saturation1 = (int16_T)rtb_Sum1;
+      rtb_Switch_b = (int16_T)rtb_Sum1;
     }
 
     /* MinMax: '<S57>/MinMax1' incorporates:
      *  Sum: '<S57>/Sum2'
      */
-    if (rtb_Saturation > rtb_Sum1_dm) {
-      rtb_Saturation = (int16_T)rtb_Sum1_dm;
+    if (rtb_Merge1 > rtb_Sum1_dm) {
+      rtb_Merge1 = (int16_T)rtb_Sum1_dm;
     }
 
     /* MinMax: '<S57>/MinMax2' incorporates:
      *  Sum: '<S57>/Sum2'
      */
-    if (rtb_Saturation1 < rtb_Sum1_dm) {
-      rtb_Saturation1 = (int16_T)rtb_Sum1_dm;
+    if (rtb_Switch_b < rtb_Sum1_dm) {
+      rtb_Switch_b = (int16_T)rtb_Sum1_dm;
     }
 
     /* Sum: '<S57>/Add' incorporates:
      *  MinMax: '<S57>/MinMax1'
      *  MinMax: '<S57>/MinMax2'
      */
-    rtb_Gain3 = rtb_Saturation + rtb_Saturation1;
+    rtb_Gain3 = rtb_Merge1 + rtb_Switch_b;
     if (rtb_Gain3 > 32767) {
       rtb_Gain3 = 32767;
     } else if (rtb_Gain3 < -32768) {
@@ -3064,13 +3043,13 @@ void BLDC_controller_step(RT_MODEL *const rtM)
     /* Gain: '<S57>/Gain2' incorporates:
      *  Sum: '<S57>/Add'
      */
-    rtb_Saturation = (int16_T)(rtb_Gain3 >> 1);
+    rtb_Switch_b = (int16_T)(rtb_Gain3 >> 1);
 
     /* Sum: '<S57>/Add1' incorporates:
      *  Gain: '<S57>/Gain2'
      *  Sum: '<S58>/Sum6'
      */
-    rtb_Switch1 -= rtb_Saturation;
+    rtb_Switch1 -= rtb_Switch_b;
     if (rtb_Switch1 > 32767) {
       rtb_Switch1 = 32767;
     } else if (rtb_Switch1 < -32768) {
@@ -3086,7 +3065,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
      *  Gain: '<S57>/Gain2'
      *  Sum: '<S57>/Sum6'
      */
-    rtb_Switch1 = rtb_Sum1 - rtb_Saturation;
+    rtb_Switch1 = rtb_Sum1 - rtb_Switch_b;
     if (rtb_Switch1 > 32767) {
       rtb_Switch1 = 32767;
     } else if (rtb_Switch1 < -32768) {
@@ -3102,7 +3081,7 @@ void BLDC_controller_step(RT_MODEL *const rtM)
      *  Gain: '<S57>/Gain2'
      *  Sum: '<S57>/Sum2'
      */
-    rtb_Switch1 = rtb_Sum1_dm - rtb_Saturation;
+    rtb_Switch1 = rtb_Sum1_dm - rtb_Switch_b;
     if (rtb_Switch1 > 32767) {
       rtb_Switch1 = 32767;
     } else if (rtb_Switch1 < -32768) {
@@ -3130,35 +3109,35 @@ void BLDC_controller_step(RT_MODEL *const rtM)
    */
   if (rtb_LogicalOperator && (rtP->z_ctrlTypSel == 2)) {
     /* Outputs for IfAction SubSystem: '<S8>/FOC_Method' incorporates:
-     *  ActionPort: '<S95>/Action Port'
+     *  ActionPort: '<S148>/Action Port'
      */
-    /* SignalConversion generated from: '<S95>/V_phaABC_FOC_in' incorporates:
+    /* SignalConversion generated from: '<S148>/V_phaABC_FOC_in' incorporates:
      *  Gain: '<S57>/Gain4'
      *  Merge: '<S8>/Merge'
      */
-    rtb_Saturation = rtDW->Gain4_o[0];
-    rtb_Saturation1 = rtDW->Gain4_o[1];
-    rtb_Merge_f_idx_2 = rtDW->Gain4_o[2];
+    rtb_Switch_b = rtDW->Gain4_o[0];
+    rtb_Merge1 = rtDW->Gain4_o[1];
+    rtb_Saturation = rtDW->Gain4_o[2];
 
     /* End of Outputs for SubSystem: '<S8>/FOC_Method' */
   } else if (rtb_LogicalOperator && (rtP->z_ctrlTypSel == 1)) {
     /* Outputs for IfAction SubSystem: '<S8>/SIN_Method' incorporates:
-     *  ActionPort: '<S96>/Action Port'
+     *  ActionPort: '<S149>/Action Port'
      */
-    /* Switch: '<S97>/Switch_PhaAdv' incorporates:
-     *  Constant: '<S97>/a_elecPeriod2'
-     *  Constant: '<S97>/b_fieldWeakEna'
-     *  Interpolation_n-D: '<S96>/r_sin3PhaA_M1'
+    /* Switch: '<S150>/Switch_PhaAdv' incorporates:
+     *  Constant: '<S150>/a_elecPeriod2'
+     *  Constant: '<S150>/b_fieldWeakEna'
+     *  Interpolation_n-D: '<S149>/r_sin3PhaA_M1'
      *  Merge: '<S3>/Merge'
-     *  Product: '<S98>/Divide2'
-     *  Product: '<S98>/Divide3'
-     *  Sum: '<S97>/Sum3'
-     *  Sum: '<S98>/Sum3'
+     *  Product: '<S151>/Divide2'
+     *  Product: '<S151>/Divide3'
+     *  Sum: '<S150>/Sum3'
+     *  Sum: '<S151>/Sum3'
      */
     if (rtP->b_fieldWeakEna) {
-      /* Sum: '<S97>/Sum3' incorporates:
+      /* Sum: '<S150>/Sum3' incorporates:
        *  Merge: '<S3>/Merge'
-       *  Product: '<S97>/Product2'
+       *  Product: '<S150>/Product2'
        *  SignalConversion generated from: '<S6>/r_fieldWeak '
        */
       rtb_Saturation = (int16_T)((int16_T)((int16_T)
@@ -3169,26 +3148,26 @@ void BLDC_controller_step(RT_MODEL *const rtM)
       rtb_Saturation = rtb_Merge;
     }
 
-    /* End of Switch: '<S97>/Switch_PhaAdv' */
+    /* End of Switch: '<S150>/Switch_PhaAdv' */
 
-    /* PreLookup: '<S96>/a_elecAngle_XA' incorporates:
-     *  Interpolation_n-D: '<S96>/r_sin3PhaA_M1'
+    /* PreLookup: '<S149>/a_elecAngle_XA' incorporates:
+     *  Interpolation_n-D: '<S149>/r_sin3PhaA_M1'
      */
     Sum = plook_u8s16_evencka(rtb_Saturation, 0, 128U, 180U);
 
-    /* Product: '<S96>/Divide2' incorporates:
-     *  Interpolation_n-D: '<S96>/r_sin3PhaA_M1'
-     *  Interpolation_n-D: '<S96>/r_sin3PhaB_M1'
-     *  Interpolation_n-D: '<S96>/r_sin3PhaC_M1'
+    /* Product: '<S149>/Divide2' incorporates:
+     *  Interpolation_n-D: '<S149>/r_sin3PhaA_M1'
+     *  Interpolation_n-D: '<S149>/r_sin3PhaB_M1'
+     *  Interpolation_n-D: '<S149>/r_sin3PhaC_M1'
      *  Merge: '<S8>/Merge'
      *  Switch: '<S8>/Switch2'
      */
-    rtb_Saturation = (int16_T)((rtb_Merge1 * rtConstP.r_sin3PhaA_M1_Table[Sum]) >>
-      14);
-    rtb_Saturation1 = (int16_T)((rtb_Merge1 * rtConstP.r_sin3PhaB_M1_Table[Sum])
+    rtb_Switch_b = (int16_T)((rtb_Saturation1 * rtConstP.r_sin3PhaA_M1_Table[Sum])
       >> 14);
-    rtb_Merge_f_idx_2 = (int16_T)((rtb_Merge1 * rtConstP.r_sin3PhaC_M1_Table[Sum])
+    rtb_Merge1 = (int16_T)((rtb_Saturation1 * rtConstP.r_sin3PhaB_M1_Table[Sum])
       >> 14);
+    rtb_Saturation = (int16_T)((rtb_Saturation1 *
+      rtConstP.r_sin3PhaC_M1_Table[Sum]) >> 14);
 
     /* End of Outputs for SubSystem: '<S8>/SIN_Method' */
   } else {
@@ -3198,11 +3177,11 @@ void BLDC_controller_step(RT_MODEL *const rtM)
     rtb_Sum2_ii = rtConstP.vec_hallToPos_Value[Sum];
 
     /* Outputs for IfAction SubSystem: '<S8>/COM_Method' incorporates:
-     *  ActionPort: '<S94>/Action Port'
+     *  ActionPort: '<S147>/Action Port'
      */
-    /* LookupNDDirect: '<S94>/z_commutMap_M1'
+    /* LookupNDDirect: '<S147>/z_commutMap_M1'
      *
-     * About '<S94>/z_commutMap_M1':
+     * About '<S147>/z_commutMap_M1':
      *  2-dimensional Direct Look-Up returning a Column,
      *  which is contiguous for column-major array
      *     Remove protection against out-of-range input in generated code: 'off'
@@ -3215,22 +3194,22 @@ void BLDC_controller_step(RT_MODEL *const rtM)
 
     rtb_Sum1 = rtb_Sum2_ii * 3;
 
-    /* Product: '<S94>/Divide2' incorporates:
-     *  LookupNDDirect: '<S94>/z_commutMap_M1'
+    /* Product: '<S147>/Divide2' incorporates:
+     *  LookupNDDirect: '<S147>/z_commutMap_M1'
      *  Merge: '<S8>/Merge'
      *  Switch: '<S8>/Switch2'
      *
-     * About '<S94>/z_commutMap_M1':
+     * About '<S147>/z_commutMap_M1':
      *  2-dimensional Direct Look-Up returning a Column,
      *  which is contiguous for column-major array
      *     Remove protection against out-of-range input in generated code: 'off'
      *   */
-    rtb_Saturation = (int16_T)(rtb_Merge1 *
+    rtb_Switch_b = (int16_T)(rtb_Saturation1 *
       rtConstP.z_commutMap_M1_table[rtb_Sum1]);
-    rtb_Saturation1 = (int16_T)(rtConstP.z_commutMap_M1_table[rtb_Sum1 + 1] *
-      rtb_Merge1);
-    rtb_Merge_f_idx_2 = (int16_T)(rtConstP.z_commutMap_M1_table[rtb_Sum1 + 2] *
-      rtb_Merge1);
+    rtb_Merge1 = (int16_T)(rtConstP.z_commutMap_M1_table[rtb_Sum1 + 1] *
+      rtb_Saturation1);
+    rtb_Saturation = (int16_T)(rtConstP.z_commutMap_M1_table[rtb_Sum1 + 2] *
+      rtb_Saturation1);
 
     /* End of Outputs for SubSystem: '<S8>/COM_Method' */
   }
@@ -3268,25 +3247,25 @@ void BLDC_controller_step(RT_MODEL *const rtM)
   /* Update for UnitDelay: '<S8>/UnitDelay4' incorporates:
    *  Switch: '<S8>/Switch2'
    */
-  rtDW->UnitDelay4_DSTATE_a = rtb_Merge1;
+  rtDW->UnitDelay4_DSTATE_a = rtb_Saturation1;
 
   /* Outport: '<Root>/DC_phaA' incorporates:
    *  DataTypeConversion: '<S8>/Data Type Conversion6'
    *  Merge: '<S8>/Merge'
    */
-  rtY->DC_phaA = (int16_T)(rtb_Saturation >> 4);
+  rtY->DC_phaA = (int16_T)(rtb_Switch_b >> 4);
 
   /* Outport: '<Root>/DC_phaB' incorporates:
    *  DataTypeConversion: '<S8>/Data Type Conversion6'
    *  Merge: '<S8>/Merge'
    */
-  rtY->DC_phaB = (int16_T)(rtb_Saturation1 >> 4);
+  rtY->DC_phaB = (int16_T)(rtb_Merge1 >> 4);
 
   /* Outport: '<Root>/DC_phaC' incorporates:
    *  DataTypeConversion: '<S8>/Data Type Conversion6'
    *  Merge: '<S8>/Merge'
    */
-  rtY->DC_phaC = (int16_T)(rtb_Merge_f_idx_2 >> 4);
+  rtY->DC_phaC = (int16_T)(rtb_Saturation >> 4);
 
   /* Outport: '<Root>/n_mot' incorporates:
    *  DataTypeConversion: '<S1>/Data Type Conversion1'
@@ -3372,65 +3351,65 @@ void BLDC_controller_initialize(RT_MODEL *const rtM)
   rtDW->If1_ActiveSubsystem_b = -1;
 
   /* SystemInitialize for IfAction SubSystem: '<S48>/Motor_Limitations_Enabled' */
-  /* Start for SwitchCase: '<S80>/Switch Case' */
+  /* Start for SwitchCase: '<S133>/Switch Case' */
   rtDW->SwitchCase_ActiveSubsystem_o = -1;
 
-  /* SystemInitialize for IfAction SubSystem: '<S80>/Voltage_Mode_Protection' */
-  /* SystemInitialize for Atomic SubSystem: '<S83>/I_backCalc_fixdt' */
+  /* SystemInitialize for IfAction SubSystem: '<S133>/Voltage_Mode_Protection' */
+  /* SystemInitialize for Atomic SubSystem: '<S136>/I_backCalc_fixdt' */
   I_backCalc_fixdt_Init(65536000, &rtDW->I_backCalc_fixdt_c);
 
-  /* End of SystemInitialize for SubSystem: '<S83>/I_backCalc_fixdt' */
+  /* End of SystemInitialize for SubSystem: '<S136>/I_backCalc_fixdt' */
 
-  /* SystemInitialize for Atomic SubSystem: '<S83>/I_backCalc_fixdt1' */
+  /* SystemInitialize for Atomic SubSystem: '<S136>/I_backCalc_fixdt1' */
   I_backCalc_fixdt_Init(65536000, &rtDW->I_backCalc_fixdt1);
 
-  /* End of SystemInitialize for SubSystem: '<S83>/I_backCalc_fixdt1' */
-  /* End of SystemInitialize for SubSystem: '<S80>/Voltage_Mode_Protection' */
+  /* End of SystemInitialize for SubSystem: '<S136>/I_backCalc_fixdt1' */
+  /* End of SystemInitialize for SubSystem: '<S133>/Voltage_Mode_Protection' */
 
-  /* SystemInitialize for IfAction SubSystem: '<S80>/Torque_Mode_Protection' */
-  /* SystemInitialize for Atomic SubSystem: '<S82>/I_backCalc_fixdt' */
+  /* SystemInitialize for IfAction SubSystem: '<S133>/Torque_Mode_Protection' */
+  /* SystemInitialize for Atomic SubSystem: '<S135>/I_backCalc_fixdt' */
   I_backCalc_fixdt_Init(58982400, &rtDW->I_backCalc_fixdt_h);
 
-  /* End of SystemInitialize for SubSystem: '<S82>/I_backCalc_fixdt' */
-  /* End of SystemInitialize for SubSystem: '<S80>/Torque_Mode_Protection' */
+  /* End of SystemInitialize for SubSystem: '<S135>/I_backCalc_fixdt' */
+  /* End of SystemInitialize for SubSystem: '<S133>/Torque_Mode_Protection' */
 
-  /* SystemInitialize for SignalConversion generated from: '<S80>/Vd_max' incorporates:
-   *  Outport: '<S80>/Vd_max'
+  /* SystemInitialize for SignalConversion generated from: '<S133>/Vd_max' incorporates:
+   *  Outport: '<S133>/Vd_max'
    */
   rtDW->OutportBufferForVd_max = 14400;
 
-  /* SystemInitialize for Gain: '<S80>/Gain3' incorporates:
-   *  Outport: '<S80>/Vd_min'
+  /* SystemInitialize for Gain: '<S133>/Gain3' incorporates:
+   *  Outport: '<S133>/Vd_min'
    */
   rtDW->Gain3 = -14400;
 
-  /* SystemInitialize for Interpolation_n-D: '<S80>/Vq_max_M1' incorporates:
-   *  Outport: '<S80>/Vq_max'
+  /* SystemInitialize for Interpolation_n-D: '<S133>/Vq_max_M1' incorporates:
+   *  Outport: '<S133>/Vq_max'
    */
   rtDW->Vq_max_M1 = 14400;
 
-  /* SystemInitialize for Gain: '<S80>/Gain5' incorporates:
-   *  Outport: '<S80>/Vq_min'
+  /* SystemInitialize for Gain: '<S133>/Gain5' incorporates:
+   *  Outport: '<S133>/Vq_min'
    */
   rtDW->Gain5 = -14400;
 
-  /* SystemInitialize for SignalConversion generated from: '<S80>/id_max' incorporates:
-   *  Outport: '<S80>/id_max'
+  /* SystemInitialize for SignalConversion generated from: '<S133>/id_max' incorporates:
+   *  Outport: '<S133>/id_max'
    */
   rtDW->OutportBufferForid_max = 12000;
 
-  /* SystemInitialize for Gain: '<S80>/Gain4' incorporates:
-   *  Outport: '<S80>/id_min'
+  /* SystemInitialize for Gain: '<S133>/Gain4' incorporates:
+   *  Outport: '<S133>/id_min'
    */
   rtDW->Gain4 = -12000;
 
-  /* SystemInitialize for Product: '<S80>/Divide1' incorporates:
-   *  Outport: '<S80>/iq_max'
+  /* SystemInitialize for Product: '<S133>/Divide1' incorporates:
+   *  Outport: '<S133>/iq_max'
    */
   rtDW->Divide1_d = 12000;
 
-  /* SystemInitialize for Gain: '<S80>/Gain1' incorporates:
-   *  Outport: '<S80>/iq_min'
+  /* SystemInitialize for Gain: '<S133>/Gain1' incorporates:
+   *  Outport: '<S133>/iq_min'
    */
   rtDW->Gain1 = -12000;
 
@@ -3457,15 +3436,14 @@ void BLDC_controller_initialize(RT_MODEL *const rtM)
   /* End of SystemInitialize for SubSystem: '<S59>/Speed_Mode' */
 
   /* SystemInitialize for IfAction SubSystem: '<S59>/Torque_Mode' */
-  /* SystemInitialize for Atomic SubSystem: '<S62>/PI_clamp_fixdt' */
-  PI_clamp_fixdt_d_Init(&rtDW->PI_clamp_fixdt_eq);
+  /* InitializeConditions for DiscreteIntegrator: '<S108>/Integrator' */
+  rtDW->Integrator_IC_LOADING = 1U;
 
-  /* End of SystemInitialize for SubSystem: '<S62>/PI_clamp_fixdt' */
   /* End of SystemInitialize for SubSystem: '<S59>/Torque_Mode' */
 
   /* SystemInitialize for IfAction SubSystem: '<S59>/Vd_Calculation' */
   /* SystemInitialize for Atomic SubSystem: '<S63>/PI_clamp_fixdt' */
-  PI_clamp_fixdt_Init(&rtDW->PI_clamp_fixdt_eo);
+  PI_clamp_fixdt_Init(&rtDW->PI_clamp_fixdt_e);
 
   /* End of SystemInitialize for SubSystem: '<S63>/PI_clamp_fixdt' */
   /* End of SystemInitialize for SubSystem: '<S59>/Vd_Calculation' */

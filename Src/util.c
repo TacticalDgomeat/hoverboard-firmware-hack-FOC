@@ -416,10 +416,10 @@ void BLDC_Init(void) {
   rtP_Left.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
   rtP_Left.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
   rtP_Left.n_polePairs          = N_POLE_PAIRS;                        // fixdt(1,16,4)
-  //rtP_Left.cf_idKi              = DI;                              // fixdt(1,16,4) ufix16_En16
-  //rtP_Left.cf_idKp              = DP;                              // fixdt(1,16,4) ufix16_En12
-  //rtP_Left.cf_iqKi              = DQ;                              // fixdt(1,16,4) ufix16_En16
-  //rtP_Left.cf_iqKp              = DQ;                              // fixdt(1,16,4) ufix16_En12
+  rtP_Left.cf_idKi              = DaI;                             // Single
+  rtP_Left.cf_idKp              = DP;                              
+  rtP_Left.cf_iqKi              = QaI;                              
+  rtP_Left.cf_iqKp              = QP;                              
 
   rtP_Right                     = rtP_Left;     // Copy the Left motor parameters to the Right motor parameters
   rtP_Right.z_selPhaCurMeasABC  = 1;            // Right motor measured current phases {Green, Blue} = {iA, iB} -> do NOT change
@@ -780,8 +780,9 @@ void Encoder_X_Align(void) {
  void handle_x_move_back_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t move_ms, uint32_t current_time) {
     // Stage A: Ramp down from high power to normal power
     if (elapsed_ticks < ramp_ms) {
-        uint32_t decel_ticks = (move_ms-ramp_ms) - elapsed_ticks;
-        encoder_x.align_inpTgt = ALIGNMENT_X_POWER + (ALIGNMENT_X_POWER * decel_ticks) / ramp_ms;
+        uint32_t decel_ticks = ramp_ms - elapsed_ticks;
+        int32_t ramp_target = ALIGNMENT_X_POWER + (ALIGNMENT_X_POWER * (int32_t)decel_ticks) / (int32_t)ramp_ms;
+        encoder_x.align_inpTgt = (int16_t)ramp_target;
     }
     // Stage B: Move emulated position back toward start
     else if (elapsed_ticks < move_ms) {

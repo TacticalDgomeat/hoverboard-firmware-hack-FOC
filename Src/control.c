@@ -390,35 +390,39 @@ TIM_HandleTypeDef TimHandle_PWM;
 uint32_t period_ticks = 0;
 uint32_t duty_ticks = 0;
 uint32_t duty_scaled = 0;
-int32_t pwm_captured_ch1_value = 0;
-int32_t pwm_captured_ch2_value = 0;
+int16_t pwm_captured_ch1_value = 0;
+int16_t pwm_captured_ch2_value = 0;
 uint32_t pwm_timeout_ch1 = 0;
 uint32_t pwm_timeout_ch2 = 0;
-/* 
+
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
   if (htim->Instance != TIM3) {
     return;
   }
 
-  if ((htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) && (htim->Instance = TIM3)) {
+    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
      period_ticks = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
      duty_ticks = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-     //hw_pwm_ready = 1;
+     hw_pwm_ready = 1;
   }
 }
-*/
+
+ 
 void calc_hw_pwm(void){
   uint32_t prev = basepri_set_threshold(1);
-  /* Read capture registers directly from TIM3 handle (no IRQ required) */
-  period_ticks = HAL_TIM_ReadCapturedValue(&TimHandle_PWM, TIM_CHANNEL_2);
-  duty_ticks = HAL_TIM_ReadCapturedValue(&TimHandle_PWM, TIM_CHANNEL_1);
-  //hw_pwm_ready = 0;
+  // Read capture registers directly from TIM3 handle (no IRQ required) //
+  //period_ticks = HAL_TIM_ReadCapturedValue(&TimHandle_PWM, TIM_CHANNEL_2);
+  //duty_ticks = HAL_TIM_ReadCapturedValue(&TimHandle_PWM, TIM_CHANNEL_1);
+  hw_pwm_ready = 0;
   if (period_ticks > 0u) {
       if (duty_ticks > period_ticks) {
         duty_ticks = period_ticks;
       }
         duty_scaled = (duty_ticks * 32000u) / period_ticks;
-        pwm_captured_ch2_value = duty_scaled - 16000u;             /* Center */
+        pwm_captured_ch2_value = duty_scaled - 16000u; 
+        #ifdef HSPWM             
+        HS_PWM = -pwm_captured_ch2_value;
+        #endif
         timeoutCntGen = 0;
         timeoutFlgGen = 0;
         //pwm_timeout_ch2 = 0;
@@ -426,6 +430,7 @@ void calc_hw_pwm(void){
     }
     basepri_restore(prev);
 }
+
 /*
 void PWM_SysTick_Callback(void) {
   pwm_timeout_ch1++;
@@ -448,7 +453,7 @@ void PWM_Init(void) {
   gpio_pwm.Pin   = PWM_PIN_CH2;
   gpio_pwm.Mode  = GPIO_MODE_AF_INPUT;
   gpio_pwm.Pull  = GPIO_PULLDOWN;
-  gpio_pwm.Speed = GPIO_SPEED_FREQ_HIGH;
+  gpio_pwm.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(PWM_PORT_CH2, &gpio_pwm);
 
   __HAL_RCC_TIM3_CLK_ENABLE();
@@ -486,7 +491,7 @@ void PWM_Init(void) {
 
   TIM_IC_InitTypeDef ic_cfg = {0};
   ic_cfg.ICPrescaler = TIM_ICPSC_DIV1;
-  ic_cfg.ICFilter = 0u;
+  ic_cfg.ICFilter = 8;
 
   ic_cfg.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   ic_cfg.ICSelection = TIM_ICSELECTION_DIRECTTI;
@@ -504,13 +509,17 @@ void PWM_Init(void) {
   /* TIM3 IRQs are not used when capturing in polling mode; keep NVIC disabled.
    * If you later want to enable interrupts, restore the two lines below.
    */
-  // HAL_NVIC_SetPriority(TIM3_IRQn, 1, 0);
-  // HAL_NVIC_EnableIRQ(TIM3_IRQn);
-
-  HAL_TIM_Base_Start(&TimHandle_PWM);
+ /* Start both captures in interrupt mode so the callback fires. */
+  HAL_NVIC_SetPriority(TIM3_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(TIM3_IRQn);
+  HAL_TIM_IC_Start_IT(&TimHandle_PWM, TIM_CHANNEL_2);
+  HAL_TIM_IC_Start_IT(&TimHandle_PWM, TIM_CHANNEL_1);
+  
+  
   /* Start input capture without interrupts (poll/read CCRx directly) */
-  HAL_TIM_IC_Start(&TimHandle_PWM, TIM_CHANNEL_2);
-  HAL_TIM_IC_Start(&TimHandle_PWM, TIM_CHANNEL_1);
+  //HAL_TIM_Base_Start(&TimHandle_PWM);
+  //HAL_TIM_IC_Start(&TimHandle_PWM, TIM_CHANNEL_2);
+  //HAL_TIM_IC_Start(&TimHandle_PWM, TIM_CHANNEL_1);
 
 
   pwm_timeout_ch1 = 0u;
