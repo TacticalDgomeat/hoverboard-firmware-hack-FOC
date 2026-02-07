@@ -113,8 +113,6 @@ void handle_x_move_back_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t
 void finalize_x_alignment(void);
 int32_t get_x_TotalCount(void);
 void count_x_update(void);
-int32_t get_y_TotalCount(void);
-void count_y_update(void);
 #endif
 
 #ifdef ENCODER_Y
@@ -128,6 +126,8 @@ void handle_y_rotation_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t 
 void handle_y_high_power_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t current_time);
 void handle_y_move_back_phase(uint32_t elapsed_ticks, uint32_t ramp_ms, uint32_t move_ms, uint32_t current_time);
 void finalize_y_alignment(void);
+int32_t get_y_TotalCount(void);
+void count_y_update(void);
 #endif
 
 
