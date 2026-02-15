@@ -168,16 +168,16 @@
 // Limitation settings
 #define I_MOT_MAX       15              // [A] Maximum single motor current limit
 #define I_DC_MAX        17              // [A] Maximum stage2 DC Link current limit for Commutation and Sinusoidal types (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
-#define I_DCL_POS       25              // [A]    LEFT Positive DC link current protection limit. Above this value, the power stage is disabled. 
-#define I_DCL_NEG       25              // [A]    LEFT Negative DC link current protection limit. Below this value, the power stage is disabled.
-#define I_DCR_POS       25              // [A]    RIGHT Positive DC link current protection limit. Above this value, the power stage is disabled.  
-#define I_DCR_NEG       25              // [A]    RIGHT Negative DC link current protection limit. Below this value, the power stage is disabled.
+#define I_DCL_POS       20              // [A]    LEFT Positive DC link current protection limit. Above this value, the power stage is disabled. 
+#define I_DCL_NEG       20              // [A]    LEFT Negative DC link current protection limit. Below this value, the power stage is disabled.
+#define I_DCR_POS       20              // [A]    RIGHT Positive DC link current protection limit. Above this value, the power stage is disabled.  
+#define I_DCR_NEG       20              // [A]    RIGHT Negative DC link current protection limit. Below this value, the power stage is disabled.
 #define DCL_HIGH_COUNTS  (2000 + (I_DCL_POS * A2BIT_CONV))  // compile-time left high threshold in ADC counts (nominal offset 2000)
 #define DCL_LOW_COUNTS   (2000 - (I_DCL_NEG * A2BIT_CONV))  // compile-time left low threshold in ADC counts (nominal offset 2000)
 #define DCR_HIGH_COUNTS  (2000 + (I_DCR_POS * A2BIT_CONV))  // compile-time right high threshold in ADC counts (nominal offset 2000)
 #define DCR_LOW_COUNTS   (2000 - (I_DCR_NEG * A2BIT_CONV))  // compile-time right low threshold in ADC counts (nominal offset 2000)
 #define N_MOT_MAX       1000             // [rpm] Maximum motor speed limit
-#define N_POLE_PAIRS    15                //[PP] Number of motor pole pairs: 15 for standard Hoverboard motors
+#define N_POLE_PAIRS    5                //[PP] Number of motor pole pairs: 15 for standard Hoverboard motors
 
 // Field Weakening / Phase Advance
 #define FIELD_WEAK_ENA  0               // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
@@ -709,7 +709,7 @@
 //#define EXTBRK_USE_CH4            // PA3
 #endif
 
-#define BAT_CELLS               5      // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
+#define BAT_CELLS               12      // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
 
 //Q axis control gains                      
 #define QP              0.6f                                  //[-] P gain
@@ -735,7 +735,7 @@
 #endif  
 
 #if defined ENCODER_X
-#define ENCODER_X_PPR              2048    // Pulses per revolution
+#define ENCODER_X_PPR              16384    // Pulses per revolution
 #define ALIGNMENT_X_POWER        3276      // [-] Voltage used for sensor alignment. [-16000, 16000]
 #endif
 #if defined ENCODER_Y
@@ -755,8 +755,8 @@
 #define DIAG_ENA                 0               // [-] disable diag if using motor at stall
 #define INACTIVITY_TIMEOUT       100            // [s] Time of inactivity after which hoverboard shuts off
 // Limitation settings
-#define I_MOT_MAX                9              // [A] Maximum single motor current limit
-#define I_DC_MAX                 17              // [A] Maximum stage2 DC Link current limit (Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
+#define I_MOT_MAX                10              // [A] Maximum single motor current limit
+#define I_DC_MAX                 15              // [A] Maximum stage2 DC Link current limit (Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
 #define N_MOT_MAX                1900            // [rpm] Maximum motor speed limit
 
 
