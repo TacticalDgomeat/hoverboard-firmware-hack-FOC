@@ -796,7 +796,7 @@
   #define PRI_INPUT2             2, -16000, 0, 16000,   0    //change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
   #define RATE                   32767     //leave to max rate 32767 if you want instant response  (may be needed if you need slower response)                  
   #define FILTER                 65535     //leave to max filter 65535 if you want instant response (may be needed if input is noisy)
-  //#define INVERT_R_DIRECTION             //invert right motor direction
+  #define INVERT_R_DIRECTION             //invert right motor direction
   //#define INVERT_L_DIRECTION             //invert left motor direction
   //#define DEBUG_SERIAL_USART3            // left sensor cable debug
 #endif
