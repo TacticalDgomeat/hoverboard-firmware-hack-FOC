@@ -224,7 +224,7 @@
 //#define BEEPER_OFF
 //#define ENCODER_X
 //#define ENCODER_Y                         // 
-#define ANALOG_BUTTON                     // ANALOG BUTTON_PIN supports greater range of voltage levels.
+//#define ANALOG_BUTTON                     // ANALOG BUTTON_PIN supports greater range of voltage levels.
 //#define HOCP                            // Tie PA6/PB12 hardware over-current signals into TIM1/TIM8 break inputs
 // #define STANDSTILL_HOLD_ENABLE          // [-] Flag to hold the position when standtill is reached. Only available and makes sense for VOLTAGE or TORQUE mode.
 // #define ELECTRIC_BRAKE_ENABLE           // [-] Flag to enable electric brake and replace the motor "freewheel" with a constant braking when the input torque request is 0. Only available and makes sense for TORQUE mode.
