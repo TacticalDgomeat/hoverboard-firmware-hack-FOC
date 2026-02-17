@@ -749,7 +749,7 @@
 
 #if defined (INTBRK_L_EN) || defined (EXTBRK_EN)
 
-  #define BRAKE_RESISTANCE 700                // [Ohm]3ohm X100 Value of the braking resistor. Set it to your own brake resistor resistance, increase the resistance here a bit for example I use 2.2ohm but I set to 3ohm here to be safe. 
+  #define BRAKE_RESISTANCE 300                // [Ohm]3ohm X100 Value of the braking resistor. Set it to your own brake resistor resistance, increase the resistance here a bit for example I use 2.2ohm but I set to 3ohm here to be safe. 
   #define BRKRESACT_SENS    40 / 20           //[A]40mA  Brake resistor activation sensitivity. Set same as MAX_REGEN_CURRENT if using battery. If using psu set 40mA-60mA. 
   #define MAX_REGEN_CURRENT 0 / 20            // [A]0mA  Maximum regenerative current that can be dissipated in the PSU or BATTERY. Set in 20mA steps 0, 20, 40, 60, 80, 100 etc. Set 0 for PSU!
 
@@ -796,7 +796,7 @@
   #define PRI_INPUT2             2, -16000, 0, 16000,   0    //change depending on input type (may be -1000, 0, 1000 or -16000, 0, 16000)
   #define RATE                   32767     //leave to max rate 32767 if you want instant response  (may be needed if you need slower response)                  
   #define FILTER                 65535     //leave to max filter 65535 if you want instant response (may be needed if input is noisy)
-  #define INVERT_R_DIRECTION             //invert right motor direction
+  //#define INVERT_R_DIRECTION             //invert right motor direction
   //#define INVERT_L_DIRECTION             //invert left motor direction
   //#define DEBUG_SERIAL_USART3            // left sensor cable debug
 #endif

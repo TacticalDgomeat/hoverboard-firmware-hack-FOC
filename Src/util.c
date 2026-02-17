@@ -846,7 +846,7 @@ void Encoder_X_Align(void) {
     if (elapsed_ticks < ramp_ms) {
         // Ramp to double power
         encoder_x.align_inpTgt = (2*ALIGNMENT_X_POWER * elapsed_ticks) / ramp_ms;
-    } else if (elapsed_ticks < T_MS(1000)) {
+    } else if (elapsed_ticks < T_MS(2000)) {
         // Hold at double power
         encoder_x.align_inpTgt = ALIGNMENT_X_POWER * 2;
     } else {
