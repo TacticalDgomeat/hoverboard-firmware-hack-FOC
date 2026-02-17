@@ -854,7 +854,7 @@ void Encoder_X_Align(void) {
       encoder_x.align_total_mid_pos = get_x_TotalCount();
       encoder_x.direction = (encoder_x.align_total_mid_pos >= encoder_x.align_total_ini_pos) ? 1 : 0;
 
-      seed_count = normalize_x_encoder_count(encoder_x.emulated_mech_count - encoder_x.offset); // +90 degree offset align to Q axis
+      seed_count = normalize_x_encoder_count(encoder_x.emulated_mech_count + encoder_x.offset); // +90 degree offset align to Q axis
       Encoder_X_ApplyDirection(encoder_x.direction);
       __HAL_TIM_SET_COUNTER(&encoder_x_handle, seed_count);
       encoder_x.ENCODER_COUNT = seed_count;
