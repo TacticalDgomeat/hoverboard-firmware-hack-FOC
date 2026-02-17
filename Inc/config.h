@@ -65,7 +65,7 @@
  * 0 - Default board type
  * 1 - Alternate board type with different pin mapping for DCLINK, Buzzer and ON/OFF, Button and Charger
 */
-#define BOARD_VARIANT           0         // change if board with alternate pin mapping
+#define BOARD_VARIANT           1         // change if board with alternate pin mapping
 //#define GD32F103Rx              1   // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
 // ######################## END OF BOARD VARIANT ###############################
 
@@ -177,7 +177,7 @@
 #define DCR_HIGH_COUNTS  (2000 + (I_DCR_POS * A2BIT_CONV))  // compile-time right high threshold in ADC counts (nominal offset 2000)
 #define DCR_LOW_COUNTS   (2000 - (I_DCR_NEG * A2BIT_CONV))  // compile-time right low threshold in ADC counts (nominal offset 2000)
 #define N_MOT_MAX       1000             // [rpm] Maximum motor speed limit
-#define N_POLE_PAIRS    6                //[PP] Number of motor pole pairs: 15 for standard Hoverboard motors
+#define N_POLE_PAIRS    15                //[PP] Number of motor pole pairs: 15 for standard Hoverboard motors
 
 // Field Weakening / Phase Advance
 #define FIELD_WEAK_ENA  0               // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
@@ -718,7 +718,7 @@
 ////////////////////////////////////////
 //#define ESTOP_REQUIRE_HOLD           // Require the button to stay pressed for the estop to remain active
 #define ESTOP_ENABLE                //ESTOP functionality enabled
-#define GD32F103Rx                  // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
+//#define GD32F103Rx                  // define if you are using a GD32F103Rx MCU to set system clock to 108MHz  
 #define HOCP                        // Tie PA6/PB12 hardware over-current signals into TIM1/TIM8 break inputs
 #define BEEPER_OFF                  //use led as beeper
 #define ENCODER_X                   //enable X encoder to right motor
@@ -730,7 +730,7 @@
 //#define EXTBRK_USE_CH4            // PA3
 #endif
 
-#define BAT_CELLS               12      // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
+#define BAT_CELLS               6      // battery number of cells. Normal Hoverboard battery: 10s = 36V nominal, 42V full charge. For 36V battery use 10, for 24V use 6, for 48V use 13 etc.
 
 //Q axis control gains                      
 #define QP              0.6f                                  //[-] P gain
@@ -756,7 +756,7 @@
 #endif  
 
 #if defined ENCODER_X
-#define ENCODER_X_PPR              16384    // Pulses per revolution
+#define ENCODER_X_PPR              1024    // Pulses per revolution
 #define ALIGNMENT_X_POWER        3276      // [-] Voltage used for sensor alignment. [-16000, 16000]
 #endif
 #if defined ENCODER_Y
