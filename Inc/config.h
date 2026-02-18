@@ -786,7 +786,7 @@
 //#define RC_PWM_RIGHT           0         // Use RC PWM as input on the RIGHT cable. (duty cycle mapped to 0 to -1000, 0, 1000) Number indicates priority for dual-input. Disable DEBUG_SERIAL_USART3!
 //#define HW_PWM                   0         // Set to 0 or 1 depending on which motor you want to control also Use hw pwm pin PB5 on left side L_MTR_HALL_PHA  or could also be L_MTR_HALL_PHC 
 //#define CONTROL_ADC            1         // use ADC as input pn pins PA2 and PA3, cant be used with extbrk on PA2/PA3  
-#define SW_PWM_RIGHT           0         // Use PWM input capture on PB10 and PB11 (duty cycle mapped to 0 to -16000, 0, 16000)
+//#define SW_PWM_RIGHT           0         // Use PWM input capture on PB10 and PB11 (duty cycle mapped to 0 to -16000, 0, 16000)
 //#define SW_PWM_LEFT            1         // Use PWM input capture on PA2 and PA3 (duty cycle mapped to 0 to -16000, 0, 16000)   (cant be use with extbrk on PA2/PA3)
 //#define CONTROL_PPM_LEFT       0         // use PPM-Sum as input on the LEFT cable. Number indicates priority for dual-input. Disable DEBUG_SERIAL_USART2!
 //#define PPM_NUM_CHANNELS       1         // total number of PPM channels to receive, even if they are not used.
