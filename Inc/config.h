@@ -776,7 +776,7 @@
 #define DIAG_ENA                 0               // [-] disable diag if using motor at stall
 #define INACTIVITY_TIMEOUT       100            // [s] Time of inactivity after which hoverboard shuts off
 // Limitation settings
-#define I_MOT_MAX                10              // [A] Maximum single motor current limit
+#define I_MOT_MAX                3              // [A] Maximum single motor current limit
 #define I_DC_MAX                 13              // [A] Maximum stage2 DC Link current limit (Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
 #define N_MOT_MAX                1900            // [rpm] Maximum motor speed limit
 
